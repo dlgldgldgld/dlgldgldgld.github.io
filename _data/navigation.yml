@@ -25,6 +25,8 @@ page_dir:
         url: /categories/Airflow/
       - title: "Linux"
         url: /categories/Linux/
+      - title: "Github"
+        url: /categories/Github/
 
   - title: Language
     children:
