@@ -1,0 +1,33 @@
+# main links
+main:
+  - title: "Posts"
+    url: /year-archive/
+  - title: "Categories"
+    url: /categories/
+  - title: "Tags"
+    url: /tags/
+  
+  # - title: "About"
+  #   url: https://mmistakes.github.io/minimal-mistakes/about/
+  # - title: "Sample Posts"
+  #   url: /year-archive/
+  # - title: "Sample Collections"
+  #   url: /collection-archive/
+  # - title: "Sitemap"
+  #   url: /sitemap/
+
+page_dir:
+  - title: Programming
+    children:
+      - title: "c++"
+        url: /categories/c++/
+      - title: "Airflow"
+        url: /categories/Airflow/
+      - title: "Linux"
+        url: /categories/Linux/
+
+  - title: Language
+    children:
+      - title: "english"
+        url: /categories/english/
+  
