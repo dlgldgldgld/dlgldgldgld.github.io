@@ -21,7 +21,7 @@ tag: Linux
 - `head "filename"` : file의 시작부터 일부만 bash에 출력.
 - `tail "filename"` : file의 끝부터 위쪽으로 일부의 내용만 bash에 출력.
 - `more or less "filename"` : file의 위쪽부터 일부분만 표시. enter로 다음줄로 넘김.
-- grep : 각 파일에서 패턴에 일치하는 행들을 찾음.
+- `grep` : 각 파일에서 패턴에 일치하는 행들을 찾음.
 	- `grep -i "hello world" menu.c main.c` : menu.c, main.c에서 'hello world'를 찾음.
 	- `ls -al | grep "kern.log"` : ls -al의 결과물에서 "kern.log"라는 text를 찾는 명령어, 이런식으로 찾아보는 경우가 많다고함.
 	- `grep "startup packages confugre" dkpg.log | tail` : grep의 결과물에서 tail tool을 사용해 console에 출력.
