@@ -32,4 +32,9 @@ page_dir:
     children:
       - title: "english"
         url: /categories/english/
+
+  - title: Etc
+    children:
+      - title: "Github-page"
+        url: /categories/Github-page/
   
