@@ -28,7 +28,7 @@ tag: Github-page
           font-size: 0.8em;
           background: $code-background-color;
           border-radius: $border-radius;
-          **color: #eb6060;**
+          color: #eb6060;
           &:before,
           &:after {
             letter-spacing: -0.2em;
