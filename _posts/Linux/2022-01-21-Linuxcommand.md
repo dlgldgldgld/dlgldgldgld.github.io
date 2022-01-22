@@ -43,3 +43,20 @@ tag: Linux
 	- `tar -zxf test.tar.gz` : 합쳐진 파일을 분리
 - `rm` : 파일 제거 명령어
 	- `rm -rf test1` : test1 경로의 모든 파일을 다 제거함
+- `date` : 현재 시간 출력
+	- cloud server 이용시 사용될 수 있음.
+	- 시스템 시간 변경도 가능.
+	- Formatting 하는 기능도 있으니 참고
+- `cal` : 달력 출력
+	- `cal -d "년-월"` : 해당 년-월의 달력 출력
+- `history` : 이전에 사용된 명령어들 확인 가능
+	- `history !number` : history-number의 명령어 실행
+- `!!` : 직전의 command 실행
+- `exit` : shell 종료
+- `echo` : console에 출력
+	- `echo "message"` : console에 message 출력
+	- `echo $pwd` : pwd 환경변수 출력
+		- $PATH 등 환경 변수 모두 가능함.
+- `env` : 모든 환경변수 목록 출력
+- `which` : 명령어 & tool 의 위치 확인 가능
+	- which ls, which file 이런것도 됨.
