@@ -26,3 +26,20 @@ tag: Linux
 	- `ls -al | grep "kern.log"` : ls -al의 결과물에서 "kern.log"라는 text를 찾는 명령어, 이런식으로 찾아보는 경우가 많다고함.
 	- `grep "startup packages confugre" dkpg.log | tail` : grep의 결과물에서 tail tool을 사용해 console에 출력.
 	- `cat dpkg.log | grep "2022-01-07 15:39:32"` : cat 명령어의 결과물에서 "2022-01-07 15:39:32" text를 찾음.
+- `find` : 파일의 위치를 찾고 후속 명령을 취할 수 있는 Tool
+	- find 명령어는 기본적으로 현재 디렉토리를 기준으로 모든 하위 디렉토리를 탐색하게 됨.
+	- `find /etc -name "Filename" -print` : /etc directory에서 파일명이 "Filename"인 것을 모두 검색해라.
+		- FileName에는 wildcard가 적용가능함. `*.conf` 라고하면 .conf로 끝나는 파일을 모두 찾음.
+- `file "filename"` : filename의 속성을 알 수 있음. 
+	- ex ) file filelist.gz : filelist.gz: gzip compressed data. was "filelist". ...
+- `gzip` : 파일을 압축해주는 명령어. .gz 파일로 압축된다.
+	- `gzip filelist` : filelist.gz 파일로 압축되어 있는 것을 확인할 수 있음.
+- `gunzip` : .gz 파일을 uncompressed 해주는 명령어 
+- `mv` : 파일 name을 변경하거나, directory 위치로 이동시켜주는 명령어
+	- `mv filenameA filenameB` : filenameA를 filenameB로 변경
+	- `mv filenameA directoryA` : filenameA를 directoryA로 이동
+- `tar` : tar는 여러개의 파일을 하나의 파일로 연결해주는 명령어이다. 압축의 개념은 아니고 있는 그대로 쭉 연결해주는 방식이다. 보통 tar 파일이라고 하는 것은 파일을 여러개로 연결해둔 파일이라고 생각하면 된다.
+	- `tar -czf test.tar.gz filelist.gz file foo` : from "filelist.gz, file, foo" to "test.tar.gz"
+	- `tar -zxf test.tar.gz` : 합쳐진 파일을 분리
+- `rm` : 파일 제거 명령어
+	- `rm -rf test1` : test1 경로의 모든 파일을 다 제거함
