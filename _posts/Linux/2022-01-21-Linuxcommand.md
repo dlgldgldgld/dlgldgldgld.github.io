@@ -43,6 +43,7 @@ tag: Linux
 	- `tar -zxf test.tar.gz` : 합쳐진 파일을 분리
 - `rm` : 파일 제거 명령어
 	- `rm -rf test1` : test1 경로의 모든 파일을 다 제거함
+	- `rm` 명령어는 윈도우와는 다르게 복구 불가.
 - `date` : 현재 시간 출력
 	- cloud server 이용시 사용될 수 있음.
 	- 시스템 시간 변경도 가능.
@@ -60,3 +61,11 @@ tag: Linux
 - `env` : 모든 환경변수 목록 출력
 - `which` : 명령어 & tool 의 위치 확인 가능
 	- which ls, which file 이런것도 됨.
+- `touch` : 파일 생성 command.
+  - `touch a.txt` : a.txt 파일 생성
+- `ln` : hardlink 생성을 위한 명령어
+  - `ln a.txt apple` : a.txt 파일의 inode를 가리키는 apple hardlink 생성.
+- `stat` : ls 이외에도 파일의 정보를 볼 수 있는 명령어. ls 보다 더 자세한 내용을 확인할 수 있다. ( Device, Block, IO Block 등등)
+  - `stat filename` : filename의 상세 내용 출력
+  - Modify : 파일 내부의 Content 변경시간
+  - Change : Inode의 변경시간
