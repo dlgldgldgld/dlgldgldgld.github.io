@@ -22,6 +22,7 @@ tag: Linux
 ## Hardlink
 - 첫번째로 소개할 link는 Hardlink 입니다. Hardlink는 파일의 inode를 직접 연결해서 바로가기를 걸어두는 것을 의미합니다. 
 - 직접 inode에 연결되어 있기 때문에 최초로 생성한 파일을 삭제하더라도 실제 File Data는 삭제되지 않습니다.
+- `ln "원본파일" "생성할 link 파일"` command를 통해 Hardlink를 생성할 수 있습니다.
   
     ![alt](../../assets/images/2022-01-24-Linux_iNode/Image1.png)
 
@@ -31,6 +32,7 @@ tag: Linux
 - 저장한 Directory의 파일이 제거된다면 Softlink 또한 사용할 수 없는 상태가 됩니다.
 - 원본 파일 제거 후, 동일한 경로에 동일한 name으로 파일을 다시 생성하면 다시 Softlink 동작이 가능합니다.
 - Softlink는 symbolic link, symlink 라고도 불립니다.
+- `ln -s "원본파일" "생성할 link 파일"` command를 통해 Softlink를 생성할 수 있습니다.
     ![alt](https://miro.medium.com/max/628/1*ojVZedoItdtM1OEpl9YatQ.png)
 
     [image 참조] : https://miro.medium.com/max/628/1*ojVZedoItdtM1OEpl9YatQ.png
