@@ -63,9 +63,19 @@ tag: Linux
 	- which ls, which file 이런것도 됨.
 - `touch` : 파일 생성 command.
   - `touch a.txt` : a.txt 파일 생성
-- `ln` : hardlink 생성을 위한 명령어
+- `ln` : link 생성을 위한 명령어. 별도의 명령어가 없다면 hardlink를 default로 생성한다.
   - `ln a.txt apple` : a.txt 파일의 inode를 가리키는 apple hardlink 생성.
+  - `ln -s a.txt banana` : a.txt와 연결된 banana ( symbollink ) 를 생성.
 - `stat` : ls 이외에도 파일의 정보를 볼 수 있는 명령어. ls 보다 더 자세한 내용을 확인할 수 있다. ( Device, Block, IO Block 등등)
   - `stat filename` : filename의 상세 내용 출력
   - Modify : 파일 내부의 Content 변경시간
   - Change : Inode의 변경시간
+- `chmod` : 파일 권한 부여. 두가지 방식으로 파일에 권한을 부여할 수 있다.
+  - `chmod 777 filename` : filename에 777 ( read, group, other ) 모두 read, write, execute 권한을 부여하라는 뜻
+  - `chmod go+rx filename` : 기존 filename의 권한에서 group, other 쪽에 read, execute 권한을 부여.
+    - u = user, g = group, o = others, a = all;
+    - + = add permission, - = remove permission
+    - r = read, w = write , x = execute
+- `adduser` : 사용자 혹은 그룹을 추가하는 명령어
+- `deluser` : 사용자 혹은 그룹을 제거하는 명령어
+- `su` : shell 상에서 로그인 계정을 변경하는 명령어
