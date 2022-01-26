@@ -19,14 +19,14 @@ main:
 page_dir:
   - title: Programming
     children:
-      - title: "c++"
-        url: /categories/c++/
       - title: "Airflow"
         url: /categories/Airflow/
       - title: "Linux"
         url: /categories/Linux/
       - title: "Github"
         url: /categories/Github/
+      - title: "Terraform"
+        url: /categories/Terraform/
 
   - title: Language
     children:
