@@ -19,14 +19,17 @@ main:
 page_dir:
   - title: Programming
     children:
-      - title: "Airflow"
-        url: /categories/Airflow/
       - title: "Linux"
         url: /categories/Linux/
-      - title: "Github"
-        url: /categories/Github/
+      - title: "Aws"
+        url: /categories/Aws/
       - title: "Terraform"
         url: /categories/Terraform/
+      - title: "Airflow"
+        url: /categories/Airflow/
+      - title: "Github"
+        url: /categories/Github/
+      
 
   - title: Language
     children:
