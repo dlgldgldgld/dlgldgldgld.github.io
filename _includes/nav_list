@@ -17,8 +17,8 @@
 
         {% if nav.children != null %}
         <ul>
-          {% assign pagecnt = 0 %}
           {% for child in nav.children %}
+            {% assign pagecnt = 0 %}
             {% for category in categories %}
               {% if category[0] == child.title %}
                 {% assign pagecnt = category[1].size %}
