@@ -22,10 +22,10 @@ tag: Aws
 
 # VPC 구성하기
 VPC는 크게 4가지 방식으로 구성된다. 
-1) VPC 내부에서 사용될 IP 주소의 범위를 정하기.
-2) 가용 영역(AZ)별 서브넷 설정하기.
-3) 인터넷으로 향하는 라우트 경로 만들기.
-4) 트래픽 Control을 위한 VPC 보안 설정 만들기.
+1. VPC 내부에서 사용될 IP 주소의 범위를 정하기.
+2. 가용 영역(AZ)별 서브넷 설정하기.
+3. 인터넷으로 향하는 라우트 경로 만들기.
+4. 트래픽 Control을 위한 VPC 보안 설정 만들기.
 
 각각의 항목에 대해서 자세하게 알아보자.
 
@@ -45,9 +45,10 @@ VPC는 크게 4가지 방식으로 구성된다.
     <br>
     출처 : https://docs.aws.amazon.com/ko_kr/vpc/latest/userguide/images/nat-gateway-diagram.png
     
+## 3. 라우팅 테이블 만들기
+
 
 <!--
-## 3. 라우팅 테이블 만들기
 ## 4. VPC 트래픽 설정
 ## NAT 게이트 웨이 ( Network Address Translation )
 -->

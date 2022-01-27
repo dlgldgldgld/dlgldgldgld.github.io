@@ -79,3 +79,15 @@ tag: Linux
 - `adduser` : 사용자 혹은 그룹을 추가하는 명령어
 - `deluser` : 사용자 혹은 그룹을 제거하는 명령어
 - `su` : shell 상에서 로그인 계정을 변경하는 명령어
+- `ps` : 프로세스 리스트 확인
+  - `ps -f` : PPID, CPU Usage(C), STIME ( Started time ) 등 더많은 Column을 출력해서 보여줌.
+  - `ps -e` : 리눅스에서 실행되는 모든 프로세스에 대해서 listing
+  - `ps -ef --forest` : 부모 - 자식 관계를 Tree 형태로 출력
+- `echo $$` : 현재 Process ID 출력
+- `echo $?` : 직전의 프로세스 종료코드 출력.
+- `kill` : Process에 Signal을 보내는 명령어
+  - `kill -l` : signal list 출력
+  - `kill -9 "pid"` or `kill -KILL "pid"` : pid에 해당되는 프로세스 종료.
+- `fg` : 포어그라운드 프로세스로 전환
+  - `fg "pid"` : pid 에 해당되는 process foreground로 전환.
+- `bg` : 백그라운드 프로세스로 전환
