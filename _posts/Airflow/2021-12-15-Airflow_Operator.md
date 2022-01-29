@@ -11,7 +11,7 @@ tag: Airflow
 <br>
 
 # DAG 생성하기
-DAG을 생성하는 위치는 `airflow init` 명령어를 수행한 **Directory / dags** 경로이다. 
+DAG을 생성하는 위치는 `airflow init` 명령어를 수행하면 생기는 `airflow.cfg`에 기록되어 있다. `[core] - dags_folder` 의 경로가 dag이 위치해야 하는 경로이다.
 해당 Directory에 python 파일을 생성하면 dag이 추가되는 형태이다. 생성하고 싶은 단어를 입력해서 dag file 하나를 만들어보자.
 
 DAG은 아래와 같이 airflow Module에서 가져올 수 있다. 
