@@ -56,6 +56,7 @@ DAG은 아래와 같이 airflow Module에서 가져올 수 있다.
   ```
   
 ### PythonOperator
+#### Python Function Operator Task
 - Python Fucntion을 하나의 Task로 만들 수 있다.
 - PythonOperator도 존재하지만 Airflow 공식 Document에서는 Task Decorator를 이용한 방법이 소개 됨.
   ```python
@@ -78,3 +79,36 @@ DAG은 아래와 같이 airflow Module에서 가져올 수 있다.
 
       run_this = print_context(ds = 'abc'  )
   ```
+
+#### virtualenv Python Operator Task
+- virtualenv 환경에서도 실행되는 operator가 제공된다. 아래와 같이 코드를 입력하면 virtualenv 환경이 제공된다.
+```python
+  from airflow import DAG
+  from airflow.decorators import task
+
+  import shutil
+  from datetime import datetime, timedelta
+  from pprint import pprint
+
+  default_args = {
+      'start_date' : datetime(2022,1,30),
+      'owner' : 'hsshin'
+  }
+
+  with DAG( dag_id = 'our_first_dag', default_args = default_args , schedule_interval = timedelta(days=1)) as dag:
+      if not shutil.which("virtualenv"):
+          pass
+      else :
+          @task.virtualenv(
+              task_id = "virtualenv_python", requirements=["colorama==0.4.0"], system_site_packages = False
+          )
+          def callable_virtualenv():
+              from time import sleep
+              from colorama import Back, Fore
+              print(Fore.RED + 'some red text')
+              print(Back.GREEN + 'and with a green background')
+              print('Finished')
+          
+          virtualenv_task = callable_virtualenv()
+```
+  ![alt](../../assets/images/2021-12-15-Airflow_Operator/virtual-env.png)
