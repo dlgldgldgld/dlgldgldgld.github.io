@@ -54,3 +54,27 @@ DAG은 아래와 같이 airflow Module에서 가져올 수 있다.
           task_id = 'sleep_date', 
           bash_command = 'echo 1' )
   ```
+  
+### PythonOperator
+- Python Fucntion을 하나의 Task로 만들 수 있다.
+- PythonOperator도 존재하지만 Airflow 공식 Document에서는 Task Decorator를 이용한 방법이 소개 됨.
+  ```python
+  from airflow import DAG
+  from airflow.decorators import task
+
+  from datetime import datetime, timedelta
+  from pprint import pprint
+
+  default_args = {
+      'start_date' : datetime(2022,1,30),
+      'owner' : 'hsshin'
+  }
+
+  with DAG( dag_id = 'our_first_dag', default_args = default_args , schedule_interval = timedelta(days=1)) as dag:
+      @task(task_id="print_the_context")
+      def print_context(ds=None, **kwargs):
+          print(ds)
+          return 'Whatever you return gets printed in the logs'
+
+      run_this = print_context(ds = 'abc'  )
+  ```
