@@ -20,7 +20,7 @@ DAG은 아래와 같이 airflow Module에서 가져올 수 있다.
 - airflow module에서 DAG 호출.
 - datetime.datetime을 사용해 날짜를 다룰 수 있다.
 - default_args : dict 자료형으로 기본 인자를 설정할 수 있다. DAG안에 있는 Operator에 설정할 공통 속성에 대해서 이곳에 정의한다. 그렇기에 BaseOperator에 있는 값을 default_args 에 전달할 수 있다.
-  - 인자값 설명 : Default Args Guide<https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/models/index.html#airflow.models.BaseOperator>
+  - 인자값 설명 : <https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/models/index.html#airflow.models.BaseOperator>
 
   ``` python
   from airflow import DAG
@@ -45,7 +45,7 @@ DAG은 아래와 같이 airflow Module에서 가져올 수 있다.
 
 ## Operator 종류
 - Operator의 종류는 매우 다양하다. 어떤 것을 주로 사용하는지는 잘 모르겠으나 친절하게 아래의 페이지에 정리가 잘 되어있다. 주로 사용될 것으로 보이는 Operator 몇가지에 대해서만 정리해보자.
-  - 링크 : Operator Guide<https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/operators/index.html>
+  - 링크 : <https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/operators/index.html>
 
 
 ### BashOperator
