@@ -112,3 +112,51 @@ DAG은 아래와 같이 airflow Module에서 가져올 수 있다.
           virtualenv_task = callable_virtualenv()
 ```
   ![alt](../../assets/images/2021-12-15-Airflow_Operator/virtual-env.png)
+
+### BranchDateTimeOperator
+- 시간에 따라 실행해야할 Task를 분기별로 설정하고 싶다면 이 Operator를 사용한다. 
+  - ex) Operator들을 생성하고 22:00:00 ~ 23:15:00 경에는 Operator1을 실행하고 이외의 시간에는 다른 Operator를 실행하고 싶을 경우 사용.
+    - `target_upper` : 23:15:00
+    - `target_lower` : 22:00:00
+
+  - 시간대를 설정할때 datetime.datetime을 통해 년월시간대 별로 조건 추가 가능.
+  - datetime.time을 통해 매일 특정 시간에 실행하도록 조건 추가 가능.
+
+``` python
+from airflow import DAG
+from datetime import datetime, timedelta, time
+from airflow.operators.datetime import BranchDateTimeOperator
+from airflow.operators.bash import BashOperator
+
+default_args = {
+    'start_date' : datetime( 2022, 2, 2 ) ,
+    'owner' : 'hsshin', 
+}
+with DAG( dag_id = 'tutorial_2', 
+          default_args = default_args,
+          tags = ['tutorial'],
+          schedule_interval = timedelta(days=1)
+          ) as dag :
+    
+        t1 = BashOperator ( 
+          task_id = 'date_in_range', 
+          bash_command = 'echo "my name is t1"' 
+        )
+
+        t2 = BashOperator ( 
+          task_id = 'date_outside_range', 
+          bash_command = 'echo "my name is t2"' 
+        )
+
+        cond1 = BranchDateTimeOperator ( 
+          task_id = 'datetime_branch',
+          follow_task_ids_if_true=['date_in_range'],
+          follow_task_ids_if_false=['date_outside_range'],
+          target_upper=datetime(2022,2,2,23,4,0),
+          target_lower=datetime(2022,2,2,23,0,0)
+
+        )
+
+        cond1 >> [t1, t2]
+
+```
