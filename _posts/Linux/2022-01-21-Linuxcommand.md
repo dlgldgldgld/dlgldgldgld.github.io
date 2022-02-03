@@ -91,3 +91,5 @@ tag: Linux
 - `fg` : 포어그라운드 프로세스로 전환
   - `fg "pid"` : pid 에 해당되는 process foreground로 전환.
 - `bg` : 백그라운드 프로세스로 전환
+- `wc` : 사용자 입력이나 파일에 대한 word count 통계를 출력.
+  - `wc < a.txt` : a.txt파일의 개행, 단어, byte 개수를 화면에 출력해줌.
