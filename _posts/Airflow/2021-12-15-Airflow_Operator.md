@@ -160,3 +160,29 @@ with DAG( dag_id = 'tutorial_2',
         cond1 >> [t1, t2]
 
 ```
+
+### SparkSubmitOperator
+- spark-submit을 task로 만들어주는 operator.
+  
+**[설치 방법]**
+1. `pip install apache-airflow-providers-apache-spark` 로 설치
+2. airflow webserver - Admin - connections (ex. http://localhost:8080/connection/list/ ) 에서 connection 생성.
+   1. Connection Type = Spark
+   2. Host = local ( test용 )
+3. 이후 아래의 코드와 같이 SparkSubmitOperator를 작성할 수 있음.
+   1. [SparkSubmitOperator Document](https://airflow.apache.org/docs/apache-airflow-providers-apache-spark/stable/_api/airflow/providers/apache/spark/operators/spark_submit/index.html?highlight=sparksubmitoperator#airflow.providers.apache.spark.operators.spark_submit.SparkSubmitOperator) 참조
+
+``` python
+from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
+
+crawler_path = "/home/hsshin/scrap_result"
+conv_respath = "/home/hsshin/tmp"
+conv_filename = datetime.now().strftime("%Y%m%d_%H%M%S.tmp")
+
+t3 = SparkSubmitOperator(
+    application = "/home/hsshin/airflow/dags/NewsStatistics/converter.py",
+    task_id = "spark_news_conv",
+    conn_id = "spark_default", 
+    application_args = [crawler_path, "csv", conv_respath, conv_filename]
+)
+```
