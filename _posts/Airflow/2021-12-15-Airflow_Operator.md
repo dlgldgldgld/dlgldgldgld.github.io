@@ -186,3 +186,33 @@ t3 = SparkSubmitOperator(
     application_args = [crawler_path, "csv", conv_respath, conv_filename]
 )
 ```
+
+
+### S3ToRedshiftOperator
+- AWS S3 -> RedShift로 Copy를 진행해주는 Operator
+
+**[설치 방법]**
+1. `pip install apache-airflow-providers-amazon` 을 통해 amazon-provider 설치
+2. **redshift_default** connection 을 설정해준다.
+   ![alt](../../assets/images/2021-12-15-Airflow_Operator/redshift-connection-env.png) 
+3. 이후 아래 코드와 같이 S3ToRedShiftOperator를 작성한다.
+   1. [S3ToRedshiftOperator Document](https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/_api/airflow/providers/amazon/aws/transfers/s3_to_redshift/index.html#airflow.providers.amazon.aws.transfers.s3_to_redshift.S3ToRedshiftOperator)
+   2. connection_id는 별도로 지정하지 않으면 **redshift_default**로 설정됨.
+
+```python
+        from airflow.providers.amazon.aws.transfers.s3_to_redshift import S3ToRedshiftOperator
+        from os import getenv
+
+        S3_BUCKET = getenv("S3_BUCKET", "recommand.news.hsshin")
+        S3_KEY = getenv("S3_KEY", key )
+        REDSHIFT_TABLE = getenv("REDSHIFT_TABLE", "newsitems")
+
+        task_transfer_s3_to_redshift = S3ToRedshiftOperator(
+            s3_bucket=S3_BUCKET,
+            s3_key=S3_KEY,
+            schema="PUBLIC",
+            table=REDSHIFT_TABLE,
+            copy_options=['parquet'],
+            task_id='transfer_s3_to_redshift',
+        )
+```
