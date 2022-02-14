@@ -23,6 +23,8 @@ page_dir:
         url: /categories/Linux/
       - title: "Aws"
         url: /categories/Aws/
+      - title: "Python"
+        url: /categories/Python/
       - title: "Spark"
         url: /categories/Spark/
       - title: "Terraform"
