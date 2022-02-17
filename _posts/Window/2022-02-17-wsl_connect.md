@@ -44,8 +44,7 @@ WSL2는 일반 Ehternet이 아닌 vEthernet이라는 **Hypver-V의 Virtual Switc
 
 
 ## 적용 방법
-결론적으로 아래 스크립트를 한번 수행하면 된다. 각 과정에서 어떤 작업이 진행되는지 살펴보자.
-
+결론적으로 아래 Powershell 스크립트를 수행하면 된다. 각 과정에서 어떤 작업이 진행되는지 살펴보자. Linux 내부 ip는 매번 새로 업데이트되기 때문에 해당 script를 시작프로그램으로 등록하는 것이 좋다.
 
 ```powershell
 $remoteport = bash.exe -c "ifconfig eth0 | grep 'inet '"
@@ -80,9 +79,28 @@ iex "netsh interface portproxy delete v4tov4 listenport=$port listenaddress=$add
 iex "netsh interface portproxy add v4tov4 listenport=$port listenaddress=$addr connectport=$port connectaddress=$remoteport";
 }
 ```
+[출처] : https://github.com/microsoft/WSL/issues/4150#issuecomment-504209723
 
-- LINE 1 : bash.exe는 wsl의 bash를 의미한다. wsl 내부 ip를 가져오기 위해 `ifconfig eth0 | grep 'inet '`을 수행한다.
-  - 이 내부 ip를 $remoteport에 저장한다. 
-    - 결과값은 `inet 'linux-ip' netmask 'subnet-mask' broadcast 'linux broadcast ip'` 이다.
-- LINE 2 ~ LINE 9: $remoteport에 저장된 값 중 inet에 있는 linux-ip 값을 가져오기 위해 수행한다. `-match` 명령어는 정규식에 매칭되는 값을 `matches` 변수에 저장한다. 성공적으로 찾았다면 `-match` 명령어는 True를 반환한다.
-- 
+### Line별 설명
+
+1. LINE 1 : bash.exe는 wsl의 bash를 의미한다. wsl 내부 ip를 가져오기 위해 `ifconfig eth0 | grep 'inet '`을 수행한다.
+   - 이 내부 ip를 $remoteport에 저장한다. 
+   - 결과값은 `inet 'linux-ip' netmask 'subnet-mask' broadcast 'linux broadcast ip'` 이다.
+2. LINE 2 ~ LINE 9: $remoteport에 저장된 값 중 inet에 있는 linux-ip 값을 가져오기 위해 수행한다. `-match` 명령어는 정규식에 매칭되는 값을 `matches` 변수에 저장한다. 성공적으로 찾았다면 `-match` 명령어는 True를 반환한다.
+3. LINE 13 : foward 하고싶은 포트들을 명시하는 곳이다.
+4. LINE 17 : 공유기로 부터 할당받은 PC의 Private ip를 입력한다. 0.0.0.0으로 해도 동작한다.
+5. LINE 18 : $ports에 있는 배열을 "," seperator를 사용해서 나열한다.
+   - string "22,80,3306,10000,3000,5000"이 된다.
+6. LINE 21 : 'WSL 2 Firewall Unlock' 이라는 명칭의 방화벽을 제거하는 명령어다.
+   - 해당 명령어를 수행한 후에 방화벽을 확인해보면 실제로 제거되어 있다.
+7. LINE 24, 25 : 방화벽을 추가하는 명령어다. `-Driection`은 Inbound, Outbound를 뜻하는 것이고 프로토콜 및 Port 들을 설정할 수 있다.
+8. LINE 29, 30 : `netsh interface portproxy` 명령어를 통해 내 IP와 Linux 가상 IP를 포워드해주는 과정이다. Linux 가상 IP는 프로그램이 다시 시작 될 때마다 변경되기 때문에 이전에 정의해둔 것은 삭제하기 위해 delete 명령어를 수행한다. 정상수행 되었다면 `netsh interface portproxy show all`에 연결 내용이 기록되어 있다.
+   - 이 방법은 여러 컴퓨터 중 한 컴퓨터만 외부에서 접속할 수 있는 상황에서 하나의 PC를 통해 여러 컴퓨터에 접속을 시키기 위해 사용하는 방식이라고 한다.
+
+
+
+### 참조 사이트
+1. Cheonghyun.com : https://www.cheonghyun.com/blog/ko/107
+2. github : https://github.com/microsoft/WSL/issues/4150
+3. 성태의 닷넷 이야기 : https://www.sysnet.pe.kr/2/0/12347
+4. gmyankee's blog: https://gmyankee.tistory.com/308
