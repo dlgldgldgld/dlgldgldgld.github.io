@@ -46,6 +46,7 @@ WSL2는 일반 Ehternet이 아닌 vEthernet이라는 **Hypver-V의 Virtual Switc
 ## 적용 방법
 결론적으로 아래 스크립트를 한번 수행하면 된다. 각 과정에서 어떤 작업이 진행되는지 살펴보자.
 
+
 ```powershell
 $remoteport = bash.exe -c "ifconfig eth0 | grep 'inet '"
 $found = $remoteport -match '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}';
@@ -79,3 +80,9 @@ iex "netsh interface portproxy delete v4tov4 listenport=$port listenaddress=$add
 iex "netsh interface portproxy add v4tov4 listenport=$port listenaddress=$addr connectport=$port connectaddress=$remoteport";
 }
 ```
+
+- LINE 1 : bash.exe는 wsl의 bash를 의미한다. wsl 내부 ip를 가져오기 위해 `ifconfig eth0 | grep 'inet '`을 수행한다.
+  - 이 내부 ip를 $remoteport에 저장한다. 
+    - 결과값은 `inet 'linux-ip' netmask 'subnet-mask' broadcast 'linux broadcast ip'` 이다.
+- LINE 2 ~ LINE 9: $remoteport에 저장된 값 중 inet에 있는 linux-ip 값을 가져오기 위해 수행한다. `-match` 명령어는 정규식에 매칭되는 값을 `matches` 변수에 저장한다. 성공적으로 찾았다면 `-match` 명령어는 True를 반환한다.
+- 
