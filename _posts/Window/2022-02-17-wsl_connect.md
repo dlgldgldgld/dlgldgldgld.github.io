@@ -94,7 +94,7 @@ iex "netsh interface portproxy add v4tov4 listenport=$port listenaddress=$addr c
 6. LINE 21 : 'WSL 2 Firewall Unlock' 이라는 명칭의 방화벽을 제거하는 명령어다.
    - 해당 명령어를 수행한 후에 방화벽을 확인해보면 실제로 제거되어 있다.
 7. LINE 24, 25 : 방화벽을 추가하는 명령어다. `-Driection`은 Inbound, Outbound를 뜻하는 것이고 프로토콜 및 Port 들을 설정할 수 있다.
-8. LINE 29, 30 : `netsh interface portproxy` 명령어를 통해 내 IP와 Linux 가상 IP를 포워드해주는 과정이다. Linux 가상 IP는 프로그램이 다시 시작 될 때마다 변경되기 때문에 이전에 정의해둔 것은 삭제하기 위해 delete 명령어를 수행한다. 정상수행 되었다면 `netsh interface portproxy show all`에 연결 내용이 기록되어 있다.
+8. LINE 29, 30 : `netsh interface portproxy` 명령어는 내 IP와 Linux 가상 IP를 포워드 해줄 수 있게한다. Linux 가상 IP는 프로그램이 다시 시작 될 때마다 변경되기 때문에 이전에 정의해둔 것은 삭제하기 위해 delete 명령어를 수행한다. 정상수행 되었다면 `netsh interface portproxy show all`에 연결 내용이 기록되어 있다.
    - 이 방법은 여러 컴퓨터 중 한 컴퓨터만 외부에서 접속할 수 있는 상황에서 하나의 PC를 통해 여러 컴퓨터에 접속을 시키기 위해 사용하는 방식이라고 한다.
 
 
