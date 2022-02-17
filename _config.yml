@@ -104,7 +104,7 @@ analytics:
 author:
   name             : "Hansoo Shin"
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "공부 내용 기록을 위해 운영중인 Blog 입니다.<br>+ 방문하는 분들께 도움이 되면 좋겠네요 :)<br>I'm using this blog to write studynote<br>+ I hope to help you who visit my blog. :)"
+  bio              : "공부 내용 기록을 위해 운영중인 Blog 입니다.<br>+ 방문하는 분들께 도움이 되면 좋겠네요 :)"
   location         : "South Korea"
   email            : "shin12272014@gmail.com"
   links:
