@@ -21,6 +21,8 @@ page_dir:
     children:
       - title: "Linux"
         url: /categories/Linux/
+      - title: "Window"
+        url: /categories/Window/
       - title: "Aws"
         url: /categories/Aws/
       - title: "Python"
