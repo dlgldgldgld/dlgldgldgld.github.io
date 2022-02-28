@@ -31,6 +31,8 @@ page_dir:
         url: /categories/Spark/
       - title: "Terraform"
         url: /categories/Terraform/
+      - title: "Kafka"
+        url: /categories/Kafka/
       - title: "Airflow"
         url: /categories/Airflow/
       - title: "Github"
