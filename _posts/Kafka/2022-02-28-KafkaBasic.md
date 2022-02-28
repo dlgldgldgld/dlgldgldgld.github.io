@@ -12,35 +12,39 @@ tag: Kafka
 - 메시지 처리 플랫폼에 관한 설명은 [https://youtu.be/qtU9gC-hVfI](https://youtu.be/qtU9gC-hVfI) 를 참조 하였습니다.
   - 주로 Message(데이터)를 받아서 필요한 app에 전달해주는 handler 역할로 사용됩니다.
   - 그밖에도 [https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying) 에서 여러가지 활용 사례들을 볼 수 있습니다.
-- 많은 기업에서 현재 서비스를 운영함에 있어 카프카를 운영하고 있습니다.
-  - 대표적으로 넷플릭스, 우버, 잘란도, 트위터, 라인, 카카오, 네이버 등이 있습니다.
-  - 2020년 기준으로는 포춘 100대 기업 중 80% 이상이 카프카를 사용 중 이였다고 합니다. 그만큼 인기가 많은 플랫폼이라고 볼 수 있습니다.
-- 메시지 처리 플랫폼은 카프카 외에도 RabbitMQ, Pulsar 등이 있습니다. **메시지 처리량 및 반응 속도**를 기준으로 Performance를 측정하는데 카프카의 메시지 처리량이 다른 것들에 비해 압도적으로 높습니다. 반응 속도는 RabbitMQ가 가장 좋지만 메시지 처리량과 합해서 봤을때는 카프카의 성능이 더 좋다고 생각할 수 있습니다. 필요에 따라 RabbitMQ를 사용하는 경우도 존재한다고 합니다.
+- 많은 기업에서 서비스를 운영함에 있어 카프카를 사용 하고 있습니다.
+  - 대표적으로 넷플릭스, 우버, 잘란도, 트위터, 라인, 카카오, 네이버 등이 있으며, 2020년 기준으로는 포춘 100대 기업 중 80% 이상이 카프카를 사용 중 이였다고 합니다. 그만큼 인기가 많은 플랫폼이라고 볼 수 있습니다.
+- 기본구조는 아래 그림과 같이 message를 제공하는 producer, 중계자 역할을 하는 kafka, 그리고 message를 받아서 사용하는 consumer 로 구성되어 있습니다. 각 항목에 대한 설명은 아래에서 추가로 살펴보도록 하겠습니다.
+  ![alt](https://data-flair.training/blogs/wp-content/uploads/sites/2/2018/04/Kafka-Architecture.png)
+- 메시지 처리 플랫폼은 카프카 외에도 RabbitMQ, Pulsar 등이 있습니다. **메시지 처리량 및 반응 속도**를 기준으로 Performance를 측정하는데 카프카의 메시지 처리량이 다른 것들에 비해 압도적으로 높습니다. 반응 속도는 RabbitMQ가 가장 좋지만 메시지 처리량과 합해서 봤을때는 카프카의 성능이 더 좋다고 볼 수 있습니다. 필요에 따라 RabbitMQ를 사용하는 경우도 존재한다고 합니다.
 ![alt](https://cdn.confluent.io/wp-content/uploads/throughput-and-latency-quantiles.png?_ga=2.268822065.158446967.1646035773-558386825.1646035773&_gac=1.128617982.1646041268.CjwKCAiAgvKQBhBbEiwAaPQw3Aq96uYb1WITWajB9MOMMx-juKciMIF1ggSV_7JDojcIa2NL3SpAmRoCngUQAvD_BwE)
 
 ----
 
 # 왜 카프카를 사용하나요?
-- 다른 플랫폼과 비교시 높은 성능을 가지고 있습니다. **다른 플랫폼들과 비교시 낮은 지연율과 높은 메시지 처리량**를 가지고 있기에 많이 사용 됩니다.
-  - 타 플랫폼들 대비 Producer, Consumer 메시지 처리량을 비교한 image ( 출처 : [https://pages.cs.wisc.edu/~akella/CS744/F17/838-CloudPapers/Kafka.pdf](https://pages.cs.wisc.edu/~akella/CS744/F17/838-CloudPapers/Kafka.pdf) ) 
+- 다른 플랫폼과 비교시 높은 성능을 가지고 있습니다. 앞선 설명에서 봤다시피 **높은 메시지 처리량과 낮은 지연율**을 가지고 있기에 인기가 많습니다.
+  - 카프카 관련 논문에 명시된 타 플랫폼들과 카프카의 Producer, Consumer 메시지 처리에 관한 image ( 출처 : [https://pages.cs.wisc.edu/~akella/CS744/F17/838-CloudPapers/Kafka.pdf](https://pages.cs.wisc.edu/~akella/CS744/F17/838-CloudPapers/Kafka.pdf) ) 
   ![alt](../../assets/images/2022-02-28-KafkaBasic/diff-performance.png)
-  
-- 서비스 확장에 따라 카프카의 성능을 높여야 한다면 편리하게 Scale out이 가능하도록 높은 확장성을 제공합니다.
-- 고가용성 (오랜 시간동안 문제없이 작동) 을 보장합니다. if kakao 2018 "카프카, 산전수전 노하우" 발표에 따르면 2년 기준으로 99.99% 의 가용성을 유지했다고 언급이 되어 있습니다.
-- 데이터를 하나의 server에만 저장하는 것이 아닌 클러스터화 된 여러 server에도 저장하여 하나의 server가 사용불가 상태가 되더라도 복구가 가능하도록 설계되어 있습니다. 
+- 기업의 서비스 확장에 따라 카프카의 성능을 높여야 한다면 편리하게 Scale out이 가능하도록 높은 확장성을 제공합니다. 카프카가 운영 되는 server인 브로커의 확장 용이성이 이에 해당됩니다.
+- 고가용성 (오랜 시간동안 문제없이 작동) 을 보장합니다. if kakao 2018 "카프카, 산전수전 노하우" 발표에 따르면 2년동안 1시간의 문제가 발생하여 약 99.99% 의 가용성을 유지했다고 언급이 되어 있습니다.
+- 데이터를 하나의 server에만 저장하는 것이 아닌 클러스터화된 여러 server에도 저장하여 하나의 server가 사용불가 상태가 되더라도 복구가 가능하도록 설계되어 있습니다.
 
 ----
 
 # 카프카를 사용하는 다양한 사례들
 - 넷플릭스 - 데이터 파이프라인 
+  - 다양한 이벤트들을 Kafka를 통해 받아와 AWS S3, Elasticsearch 에 전달합니다.
   - [https://netflixtechblog.com/evolution-of-the-netflix-data-pipeline-da246ca36905](https://netflixtechblog.com/evolution-of-the-netflix-data-pipeline-da246ca36905)
     ![alt](https://miro.medium.com/max/1400/0*twzMM1i4zLCilScl.)
 
 - 우버 - 데이터 통합
+  - 카프카를 사용하여 batch 및 realtime 파이프라인을 구축하는데 사용함을 알 수 있습니다. 아래의 이미지처럼 Data Science에 사용이 될때는 굳이 리얼타임으로 처리될 필요가 없기 때문에 배치로 사용됨을 알 수 있습니다.
+  - 이 밖에도 우버에서는 미켈란젤로라는 프로젝트에도 카프카를 사용하는 등 다양한 프로젝트에 카프카를 활용 중입니다.
   - [https://eng.uber.com/ureplicator-apache-kafka-replicator](https://eng.uber.com/ureplicator-apache-kafka-replicator)
     ![alt](http://1fykyq3mdn5r21tpna3wkdyi-wpengine.netdna-ssl.com/wp-content/uploads/2016/08/image00.png)
 
 - 머신러닝 분야 활용 사례
+  - 아래 이미지와 같이 다양한 언어 및 프레임워크를 통해 카프카에 메시지를 전달함을 알 수 있습니다.
   - [https://www.confluent.io/blog/build-deploy-scalable-machine-learning-production-apache-kafka](https://www.confluent.io/blog/build-deploy-scalable-machine-learning-production-apache-kafka)
   ![alt](https://cdn.confluent.io/wp-content/uploads/Kafka-Producer-Consumer.png)
 
@@ -60,6 +64,8 @@ tag: Kafka
     | 파티션                    | 병렬처리 + 고성능을 얻기 위해 하나의 토픽을 여러 개로 나눈 것을 의미        |
     | 세그먼트                  | 프로듀서가 전송한 실제 메시지가 브로커의 로컬 디스크에 저장되는 파일을 뜻함 |
     | 메시지 or 레코드          | 프로듀서가 브로커로 전송하거나 컨슈머가 읽어가는 데이터 조각을 뜻함         |
+  
+  ![alt](https://data-flair.training/blogs/wp-content/uploads/sites/2/2018/04/Kafka-Architecture.png)
 
 ## 카프카 - 리플리케이션
 - 메시지를 보낼 때 하나의 브로커로만 보내지 않고 여러 개의 브로커에 동일한 메시지를 보내는 동작을 의미합니다.
