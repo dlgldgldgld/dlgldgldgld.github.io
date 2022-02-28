@@ -16,6 +16,8 @@ tag: Kafka
   - 2020년 기준으로 포춘 100대 기업 중 80% 이상이 카프카를 사용.
 - 메시지 처리 플랫폼은 카프카 외에도 RabbitMQ, Pulsar 등이 있으며 **메시지 처리량 및 반응 속도**를 기준으로 Performance를 비교합니다. 필요에 따라 RabbitMQ를 사용하는 경우도 존재합니다.
 
+----
+
 # 왜 카프카를 사용하나요?
 - 다른 플랫폼과 비교시 높은 성능을 가지고 있습니다. **다른 플랫폼들과 비교시 낮은 지연율과 높은 메시지 처리량**를 가지고 있기에 많이 사용 됩니다.
   - 타 플랫폼들 대비 Producer, Consumer 메시지 처리량을 비교한 image ( 출처 : [https://pages.cs.wisc.edu/~akella/CS744/F17/838-CloudPapers/Kafka.pdf](https://pages.cs.wisc.edu/~akella/CS744/F17/838-CloudPapers/Kafka.pdf) ) 
