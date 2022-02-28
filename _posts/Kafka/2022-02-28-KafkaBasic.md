@@ -8,13 +8,15 @@ tag: Kafka
 본 문서는 [실전 카프카] 개발부터 운영까지 - Chapter3 : Kafka의 기본 개념과 구조를 참조하였습니다.
 
 # 카프카란?
-- Kafka는 링크드인에서 개발된 분산 메시지 처리 플랫폼으로 **대용량 데이터 실시간 스트리밍**을 위해 주로 사용합니다.
+- Kafka는 링크드인에서 개발된 분산 메시지 처리 플랫폼으로 **대용량 데이터 실시간 스트리밍**을 위해 주로 사용합니다. 
+- 메시지 처리 플랫폼에 관한 설명은 [https://youtu.be/qtU9gC-hVfI](https://youtu.be/qtU9gC-hVfI) 를 참조 하였습니다.
   - 주로 Message(데이터)를 받아서 필요한 app에 전달해주는 handler 역할로 사용됩니다.
   - 그밖에도 [https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying) 에서 여러가지 활용 사례들을 볼 수 있습니다.
 - 많은 기업에서 현재 서비스를 운영함에 있어 카프카를 운영하고 있습니다.
   - 대표적으로 넷플릭스, 우버, 잘란도, 트위터, 라인, 카카오, 네이버 등이 있습니다.
-  - 2020년 기준으로 포춘 100대 기업 중 80% 이상이 카프카를 사용.
-- 메시지 처리 플랫폼은 카프카 외에도 RabbitMQ, Pulsar 등이 있으며 **메시지 처리량 및 반응 속도**를 기준으로 Performance를 비교합니다. 필요에 따라 RabbitMQ를 사용하는 경우도 존재합니다.
+  - 2020년 기준으로는 포춘 100대 기업 중 80% 이상이 카프카를 사용 중 이였다고 합니다. 그만큼 인기가 많은 플랫폼이라고 볼 수 있습니다.
+- 메시지 처리 플랫폼은 카프카 외에도 RabbitMQ, Pulsar 등이 있습니다. **메시지 처리량 및 반응 속도**를 기준으로 Performance를 측정하는데 카프카의 메시지 처리량이 다른 것들에 비해 압도적으로 높습니다. 반응 속도는 RabbitMQ가 가장 좋지만 메시지 처리량과 합해서 봤을때는 카프카의 성능이 더 좋다고 생각할 수 있습니다. 필요에 따라 RabbitMQ를 사용하는 경우도 존재한다고 합니다.
+![alt](https://cdn.confluent.io/wp-content/uploads/throughput-and-latency-quantiles.png?_ga=2.268822065.158446967.1646035773-558386825.1646035773&_gac=1.128617982.1646041268.CjwKCAiAgvKQBhBbEiwAaPQw3Aq96uYb1WITWajB9MOMMx-juKciMIF1ggSV_7JDojcIa2NL3SpAmRoCngUQAvD_BwE)
 
 ----
 
@@ -22,7 +24,7 @@ tag: Kafka
 - 다른 플랫폼과 비교시 높은 성능을 가지고 있습니다. **다른 플랫폼들과 비교시 낮은 지연율과 높은 메시지 처리량**를 가지고 있기에 많이 사용 됩니다.
   - 타 플랫폼들 대비 Producer, Consumer 메시지 처리량을 비교한 image ( 출처 : [https://pages.cs.wisc.edu/~akella/CS744/F17/838-CloudPapers/Kafka.pdf](https://pages.cs.wisc.edu/~akella/CS744/F17/838-CloudPapers/Kafka.pdf) ) 
   ![alt](../../assets/images/2022-02-28-KafkaBasic/diff-performance.png)
-
+  
 - 서비스 확장에 따라 카프카의 성능을 높여야 한다면 편리하게 Scale out이 가능하도록 높은 확장성을 제공합니다.
 - 고가용성 (오랜 시간동안 문제없이 작동) 을 보장합니다. if kakao 2018 "카프카, 산전수전 노하우" 발표에 따르면 2년 기준으로 99.99% 의 가용성을 유지했다고 언급이 되어 있습니다.
 - 데이터를 하나의 server에만 저장하는 것이 아닌 클러스터화 된 여러 server에도 저장하여 하나의 server가 사용불가 상태가 되더라도 복구가 가능하도록 설계되어 있습니다. 
