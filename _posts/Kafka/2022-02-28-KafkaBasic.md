@@ -25,6 +25,8 @@ tag: Kafka
 - 고가용성 (오랜 시간동안 문제없이 작동) 을 보장합니다. if kakao 2018 "카프카, 산전수전 노하우" 발표에 따르면 2년 기준으로 99.99% 의 가용성을 유지했다고 언급이 되어 있습니다.
 - 데이터를 하나의 server에만 저장하는 것이 아닌 클러스터화 된 여러 server에도 저장하여 하나의 server가 사용불가 상태가 되더라도 복구가 가능하도록 설계되어 있습니다. 
 
+----
+
 # 카프카를 사용하는 다양한 사례들
 - 넷플릭스 - 데이터 파이프라인 
   - [https://netflixtechblog.com/evolution-of-the-netflix-data-pipeline-da246ca36905](https://netflixtechblog.com/evolution-of-the-netflix-data-pipeline-da246ca36905)
@@ -37,6 +39,8 @@ tag: Kafka
 - 머신러닝 분야 활용 사례
   - [https://www.confluent.io/blog/build-deploy-scalable-machine-learning-production-apache-kafka](https://www.confluent.io/blog/build-deploy-scalable-machine-learning-production-apache-kafka)
   ![alt](https://cdn.confluent.io/wp-content/uploads/Kafka-Producer-Consumer.png)
+
+----
 
 # 카프카의 기본 구조
 - 카프카는 기본적으로 Pub/ Sub 기반 Event Driven Architecture로 구성되어 있습니다. 주요 요소들로는 아래와 같습니다.
@@ -81,6 +85,8 @@ tag: Kafka
 - 하나의 파티션에는 여러개의 세그먼트가 존재 할 수 있습니다.
 - `/data/kafka-logs/` 경로에 저장이 되며 실제 카프카 서버에서 해당 폴더로 이동해보면 세그먼트가 저장되어 있음을 알 수 있습니다.
     ![alt](../../assets/images/2022-02-28-KafkaBasic/segment-example.png)
+
+----
 
 # 카프카의 핵심 개념
 
