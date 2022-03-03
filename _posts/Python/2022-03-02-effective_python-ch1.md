@@ -1,11 +1,11 @@
 ---
 layout: single
-title:  "파이썬 코딩의 기술 : Effective PYTHON 2ND - 요약 및 코드 정리"
+title:  "[파이썬 코딩의 기술 : Effective PYTHON 2ND 요약 및 코드 정리] CHAPTER 1. 파이썬 답게 생각하기"
 category: Python
 tag: Python
 ---
 
-# 파이썬 코딩의 기술 : Effective PYTHON 2ND - 요약 및 코드 정리
+# [파이썬 코딩의 기술 : Effective PYTHON 2ND 요약 및 코드 정리] CHAPTER 1. 파이썬 답게 생각하기
 
 ## Chapter 1. 파이썬답게 생각하기 
 
