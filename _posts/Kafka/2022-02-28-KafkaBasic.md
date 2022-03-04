@@ -9,7 +9,7 @@ tag: Kafka
 
 # 카프카란?
 - Kafka는 링크드인에서 개발된 분산 메시지 처리 플랫폼으로 **대용량 데이터 실시간 스트리밍**을 위해 주로 사용합니다. 
-  - 주로 Message(데이터)를 받아서 필요한 app에 전달해주는 handler 역할로 사용됩니다.
+- 주로 Message(데이터)를 받아서 필요한 app에 전달해주는 handler 역할로 사용됩니다. 실시간 스트리밍에서는 메시지가 handler에게 정확하게 전달이 되었는지, 처리시간은 빠르게 끝나게 되었는지 등이 중요합니다. 카프카는 이런 충족 사항들을 높은 수준으로 만족하기 때문에 메시지 핸들러 역할(브로커)로 많이 사용됩니다.
   - 그밖에도 [https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying) 에서 여러가지 활용 사례들을 볼 수 있습니다.
   - 메시지 처리 플랫폼에 관한 설명이 필요하다면 [https://youtu.be/qtU9gC-hVfI](https://youtu.be/qtU9gC-hVfI)참조바랍니다.
 - 많은 기업에서 서비스를 운영함에 있어 카프카를 사용 하고 있습니다.
