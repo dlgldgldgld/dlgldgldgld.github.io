@@ -292,16 +292,278 @@ log('좋아하는 숫자는?', 7, 33) # 문제 발생
 
 <br>
 
-### template
+### 23. 키워드 인자로 선택적인 기능을 제공하라
 
 **- Code**
 ```python
+# 우선 키워드 인자의 예시부터 알아보자
+
+def remainder( number, divisor ) :
+    return number % divisor
+
+assert remainder(20, 7) == 6
+# 아래 예시들을 보면 args에 keyword와 함께 값을 대입하는 모습을 볼 수 있는데
+# 이를 키워드 인자를 사용한 function 이라고 볼 수 있다.
+print(f'{remainder(20, 7)=}')
+print(f'{remainder(20, divisor=7)=}')
+print(f'{remainder(number = 20, divisor = 7)=}')
+print(f'{remainder(divisor = 7, number = 20)=}')
+
+# 키워드 인자는 무조건 위치 args 보다 뒤에 정의되어야 한다. 그렇지 않으면 에러가 발생한다.
+# remainder( number=20, 7 )
+
+# ** 연산자를 통해 map을 unpacking 해서 인자로 전달하는 것이 가능하다.
+
+my_kwargs = {
+    'number' : 20,
+    'divisor' : 7,
+}
+
+print (f'{remainder(**my_kwargs)=}')
+
+# 키워드 인자 사용시 발생하는 장점들
+# 1. 코드를 처음보는 사람들에게 함수 호출의 의미를 명확하게 알려줄 수 있음.
+#    그냥 인자를 툭 던져주는 것보다는 "나머지를 구하는데 필요한게 number와 divisor가 있다."" 라고 명확하게 의미 파악이 가능.
+print(f'{remainder(20, 7)=}')
+print(f'{remainder(number = 20, divisor = 7)=}')
+
+# 2. 키워드 인자의 경우 함수 정의에서 디폴트 값을 지정할 수 있다.
+#    ( 이거는 상관없는 얘기 아닌가 )
+def flow_rate(weight_diff, time_diff, period = 1):
+    return (weight_diff / time_diff ) * period
+    
+# 3. 기존 사용자에게 호환성을 제공하며 function 변경이 가능.
+#    아래와 같이 default 값을 미리 설정하면 기존 의도를 해치지 않은 상태로 소스 변경을 하는 것이 가능하다.
+
+# 수정 전
+def flow_rate(weight_diff, time_diff):
+    return (weight_diff / time_diff )
+
+# 수정 후
+def flow_rate(weight_diff, time_diff, period = 1):
+    return (weight_diff / time_diff ) * period
+
+flow_rate(2,3, period=3.3)
+```
+
+**- Result**
+```text
+remainder(20, 7)=6
+remainder(20, divisor=7)=6
+remainder(number = 20, divisor = 7)=6
+remainder(divisor = 7, number = 20)=6
+remainder(**my_kwargs)=6
+remainder(20, 7)=6
+remainder(number = 20, divisor = 7)=6
+```
+
+### 24. None과 독스트링을 사용해 동적인 디폴트 인자를 지정하라
+
+**- Code**
+```python
+# default 인자의 잘못된 사용방법
+# 아래 코드에서 when이 같은 이유는 "default 인자"는 module 호출시 최초의 실행된 값을 기준으로만 할당한다.
+# now()함수는 호출할때마다 실행되는 개념이 아니고, 한번만 실행 된 후 어딘가에 저장된 이후에는 저장된 값을 빼쓰는 구조라는 뜻이다.
+
+import datetime
+from time import sleep
+def log(msg, when = datetime.datetime.now()):
+    print(f'{when}-{msg}')
+
+log("안녕!")
+sleep(0.1)
+log("또 안녕!")
+
+
+# 위의 경우에는 원하는 동작을 하기 위해 디폴트 인자로 None을 지정하고 실제 동작을 독스트링에 기재하는 방법이 있다.
+def log(msg, when=None):
+    """메시지와 타임스태프를 로그에 남긴다.
+
+    Args:
+        message: 출력할 메시지.
+        when : 메시지 발생한 시각(datetime).
+               디폴트 값은 현재 시간이다.
+    """
+
+    if when is None :
+        when = datetime.datetime.now()
+    print(f'{when}:{msg}')
+
+log("안녕!")
+sleep(0.1)
+log("또 안녕!")
+
+# 위와 관련된 또다른 오류 예시다.
+# foo와 bar는 decode의 default를 공유하기 때문에 동일한 주소를 가진 값으로 인식한다.
+
+import json
+def decode(data, default={}):
+    try:
+        return json.loads(data)
+    except ValueError:
+        return default
+
+foo = decode('잘못된 데이터')
+foo['stuff'] = 5
+bar = decode('잘못된 데이터')
+bar['meep'] = 1
+print('Foo:', foo)
+print('Bar:', bar)
+
+assert foo is bar
+
+# 의도에 맞게 동작하도록 decode 함수를 None과 독스트링을 사용해 개선해보자.
+def decode(data, default=None):
+    """문자열로부터 JSON 데이터를 읽어온다.
+
+    Args:
+        ~~
+    """
+    try:
+        return json.loads(data)
+    except ValueError:
+        if default is None:
+            default = {}
+        return default
+
+foo = decode('잘못된 데이터')
+foo['stuff'] = 5
+bar = decode('잘못된 데이터')
+bar['meep'] = 1
+print('Foo:', foo)
+print('Bar:', bar)
+assert foo is not bar
 
 ```
 
 **- Result**
 ```text
+2022-03-06 10:34:10.309829-안녕!
+2022-03-06 10:34:10.309829-또 안녕!
+2022-03-06 10:34:10.412265:안녕!
+2022-03-06 10:34:10.523557:또 안녕!
+Foo: {'stuff': 5, 'meep': 1}
+Bar: {'stuff': 5, 'meep': 1}
+Foo: {'stuff': 5}
+Bar: {'meep': 1}
+```
+
+### 25. 위치로만 인자를 지정하게 하거나 키워드로만 인자를 지정하게 해서 함수 호출을 명확하게 만들어라
+
+**- Code**
+```python
+# Default 인자 및 위치적 인자를 강제로 적용하기 싶은 경우가 있다.
+# 예를 들면 아래의 예시에서는 numerator, denominator의 경우에는 argument의 name이 자주 바뀔 수 있어
+# 위치적 인자로만 설정하고 싶고, ignore_overflow, ignore_zero_division은 사용자가 의미를 명확하게 사용할 수 있도록
+# keyword 인자로만 사용하게 싶은 경우이다.
+# 이럴 경우 parameter에 `/`나 `*`을 적절히 활용하면 의도한 바를 명확하게 지정할 수 있다.
+# 1. `/` : 위치적 인자로 지정하고 싶은 곳까지의 바로 뒤에 /를 쓰면 그 값들은 keyword 인자로 사용되는 것이 불가능하다.
+#          그렇기 때문에 positional argument로만 사용되도록 강제된다.
+# 2. `*` : keyword 인자로만 사용하고 싶은 곳 앞에 붙인다. 그러면 어떤 index에 keyword 인자가 존재하는지 체크가 불가능하기 때문에
+#          keyword 인자로만 사용되도록 강제된다.
+# 3. '/' ~ '*' : 여기에 들어가는 값은 positional, keyword로 모두 적용가능한 인자가 된다.
+def safe_division_e(numerator, denominator, /,
+                    ndigits=10, *,
+                    ignore_overflow=False,
+                    ignore_zero_division=False):
+    try:
+        fraction = numerator / denominator
+        return round(fraction, ndigits)
+    except OverflowError:
+        if ignore_overflow:
+            return 0
+        else :
+            raise
+    except ZeroDivisionError:
+        if ignore_zero_division:
+            return float('inf')
+        else:
+            raise
+
+print(f'{safe_division_e(22,7)=}')
+print(f'{safe_division_e(22,7,5)=}')
+print(f'{safe_division_e(22,7,ndigits=2)=}')
 
 ```
 
-<br>
+**- Result**
+```text
+safe_division_e(22,7)=3.1428571429
+safe_division_e(22,7,5)=3.14286
+safe_division_e(22,7,ndigits=2)=3.14
+```
+
+### 26. functools.wrap을 사용해 함수 데코레이터를 정의하라
+
+**- Code**
+```python
+# debug용으로 아래와 같은 함수를 작성해서 decorator로 넣어주곤 한다.
+def trace(func):
+    def wrapper(*args, **kwargs):
+        res = func(*args, **kwargs)
+        print(f'{func.__name__}({args!r}, {kwargs!r} '
+              f'-> {res!r}')
+        return res
+    return wrapper
+
+@trace
+def fibonacci(n):
+    if n in (0,1):
+        return n
+    return (fibonacci(n-2) + fibonacci(n-1))
+
+# 잘 동작한다.
+fibonacci(4)
+
+# 허나 그냥 print를 날려보면 fibonacci 함수는 fibonacci가 아닌 wrapper 함수라고 정의되고 있음을 알수 있다.
+print(fibonacci)
+help(fibonacci)
+# 이런 동작은 디버깅을 하거나 인트로스펙션(실행시점 프로그램이 어떻게 실행되는지 관찰) 할때 문제가 된다.
+# 이런 경우에는 functools 내장 모듈에 있는 wraps 함수를 사용하는 방법이 있다.
+
+from functools import wraps
+def trace(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        res = func(*args, **kwargs)
+        print(f'{func.__name__}({args!r}, {kwargs!r} '
+              f'-> {res!r}')
+        return res
+    return wrapper
+
+@trace
+def fibonacci(n):
+    """
+        n번째 피보나치를 반환하는 함수인데요.
+    """
+    if n in (0,1):
+        return n
+    return (fibonacci(n-2) + fibonacci(n-1))
+
+#그러면 의도와 같이 정확하게 나옴을 알 수 있다.
+print(fibonacci)
+help(fibonacci)
+```
+
+**- Result**
+```text
+fibonacci((0,), {} -> 0
+fibonacci((1,), {} -> 1
+fibonacci((2,), {} -> 1
+fibonacci((1,), {} -> 1
+fibonacci((0,), {} -> 0
+fibonacci((1,), {} -> 1
+fibonacci((2,), {} -> 1
+fibonacci((3,), {} -> 2
+fibonacci((4,), {} -> 3
+<function trace.<locals>.wrapper at 0x00000289683FCD30>
+Help on function wrapper in module __main__:
+
+wrapper(*args, **kwargs)
+
+<function fibonacci at 0x0000028968A0AD30>
+Help on function fibonacci in module __main__:
+
+fibonacci(n)
+    n번째 피보나치를 반환하는 함수인데요.
+```
