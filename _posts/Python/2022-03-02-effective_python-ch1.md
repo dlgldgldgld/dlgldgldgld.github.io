@@ -348,17 +348,3 @@ apple exceed 4.
 ```
 
 <br>
-
-### template
-
-**- Code**
-```python
-
-```
-
-**- Result**
-```text
-
-```
-
-<br>
