@@ -19,26 +19,34 @@ main:
 page_dir:
   - title: Programming
     children:
-      - title: "Linux"
-        url: /categories/Linux/
-      - title: "Window"
-        url: /categories/Window/
-      - title: "Aws"
-        url: /categories/Aws/
       - title: "Python"
         url: /categories/Python/
+      - title: "Github"
+        url: /categories/Github/
+      
+  - title: Data-Engineer
+    children:
       - title: "Spark"
         url: /categories/Spark/
-      - title: "Terraform"
-        url: /categories/Terraform/
       - title: "Kafka"
         url: /categories/Kafka/
       - title: "Airflow"
         url: /categories/Airflow/
-      - title: "Github"
-        url: /categories/Github/
-      
+  
+  - title: OS
+    children:
+      - title: "Linux"
+        url: /categories/Linux/
+      - title: "Window"
+        url: /categories/Window/
 
+  - title: Cloud
+    children:
+      - title: "Aws"
+        url: /categories/Aws/
+      - title: "Terraform"
+        url: /categories/Terraform/
+  
   - title: Language
     children:
       - title: "english"
