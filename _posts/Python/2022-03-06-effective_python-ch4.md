@@ -486,29 +486,12 @@ run_cascading()
 
 ### 35. 제너레이터 안에서 throw로 상태를 변화시키지 말라
 
-**- Code**
-```python
-
-```
-
-**- Result**
-```text
-
-```
-
+내용이 잘 이해가 되지 않아서 우선 pass
+정확하게 뭔말을 하고싶은지 모르겠는데 generator를 쓸때 throw를 쓰지말자.
 <br>
 
-### template
+### 36. 이터레이터나 제너레이터를 다룰 때는 itertools를 사용하라
+해당 내용은 아래 페이지에 정리했다.
 
-**- Code**
-```python
-
-```
-
-**- Result**
-```text
-
-```
-
+[itertools 사용 예제 정리](https://github.com/dlgldgldgld/Python-Practice/blob/main/itertools/itertools_example.ipynb)
 <br>
-
