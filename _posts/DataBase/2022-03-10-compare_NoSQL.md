@@ -62,14 +62,15 @@ RDBMS만 사용해봤던 나에게는 소개해준 내용들이 뙇! 와닿지�
 Key-Value Store는 흔히 사용하는 Map과 유사한 형태다. Value를 식별하기 위한 Key가 존재하고 그 Key를 통해 Value를 빠르게 찾아낼 수 있는 방식이다. 
 
 ![alt](https://hazelcast.com/wp-content/uploads/2021/12/diagram-KeyValueStore-500x800-1.png)
-[출처] : [https://hazelcast.com/glossary/key-value-store/](https://hazelcast.com/glossary/key-value-store/)
+
+[ 출처 ] : [https://hazelcast.com/glossary/key-value-store/](https://hazelcast.com/glossary/key-value-store/)
 
 RDB와 비교했을때 이는 어떤 차이가 있을까? RDB는 Row 기준으로 Record를 차곡차곡 쌓아가는 행지향 방식의 스토리지다. Python의 list나 C++의 Vector 등을 생각해보자. 해당 컨테이너에 record를 쌓고 찾을때 방식을 기억하는가? 순차적으로 찾거나 아니면 Binary Search를 통해 빠르게 찾아내곤 한다. 하지만 그보다 더 빠른 것이 Hash Table을 통해 항상 log(1)로 값을 찾아오는 Map이다. 
 
 위의 예시를 다시 행지향 스토리지(RDB)와 Key-Value Store로 빗대어 생각해보자. 
 과연 Find 하는게 어떤 것이 더 빠를까? 당연히 후자가 되는 것이다.
 
-[https://hazelcast.com/glossary/key-value-store/](https://hazelcast.com/glossary/key-value-store/) 페이지에서 소개되는 KVS 데이터 베이스의 use cases들을 살펴보자.
+[https://hazelcast.com/glossary/key-value-store](https://hazelcast.com/glossary/key-value-store/) 페이지에서 소개되는 KVS 데이터 베이스의 use cases들을 살펴보자.
 
 1. 웹 어플리케이션 : user id를 Key값으로 user session 세부 정보와 기본 설정을 저장. 필요할때마다 빠르게 쓰고 읽을 수 있음.
 2. 실시간 추천 시스템 : 웹 사이트를 빠르게 이동할때 중간중간에 보이는 추천광고를 이를 통해 구현한다고 한다.
@@ -97,7 +98,7 @@ Table은 어느 DB와 마찬가지로 똑같이 DB안에서 구분되는 메인 
 
 ![alt](https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/images/HowItWorksPeople.png)
 
-[출처] : [https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html](https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html)
+[ 출처 ] : [https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html](https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html)
 
 다음으로는 Key에 대해서 알아보자. Key-Value Store이므로 당연히 Primary-Key가 필요할 것이다.
 DynamoDB에서는 두가지 종류의 Primarykey를 지원한다.
@@ -111,7 +112,7 @@ DynamoDB에서는 두가지 종류의 Primarykey를 지원한다.
 
 ![alt](https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/images/HowItWorksMusic.png)
 
-[출처]:[https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/images/HowItWorksMusic.png](https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/images/HowItWorksMusic.png)
+[ 출처 ] : [https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/images/HowItWorksMusic.png](https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/images/HowItWorksMusic.png)
 
 이 밖에도 DynamoDB는 보조 인덱스 및 DynamoDB Streams라는 구성요소가 있는 것으로 보인다. 이에 대해서는 이 글에서 다룰 내용의 범위를 벗어난 항목인 것 같아서 추후에 기회가 되면 찾아보도록 해야겠다. 
 
