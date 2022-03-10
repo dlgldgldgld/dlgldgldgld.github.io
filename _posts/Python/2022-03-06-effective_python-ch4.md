@@ -286,6 +286,218 @@ TypeError: 컨테이너를 제공해야 합니다
 <br>
 
 
+### 32. 긴 리스트 컴프리헨션보다는 제너레이터 식을 사용하라
+
+**- Code**
+```python
+# generator는 알다시피 아래와 같이 선언이 가능하다.
+# 리스트와 같이 element를 가지는 구조는 아니기 때문에 용량을 아낄 수 있다.
+it = (len(x) for x in open('my_file.txt'))
+
+# generator의 또다른 장점은 두 제네레이터 식을 합성할 수 있다는 것이다.
+# 유용하니 기억해두도록 하자
+roots = ((x, x**0.5) for x in it )
+next(roots)
+```
+
+**- Result**
+```text
+
+```
+
+<br>
+
+### 33. yield from을 사용해 여러 제너레이터를 합성하라
+
+**- Code**
+```python
+# Generator들을 사용해 기능을 구현 중인 함수가 있다고 가정하자.
+# animate() 코드는 for 문이 여러개로 구성되어 있어 조금 번잡한 구조다.
+# 이를 yield from 구문을 통해 개선할 수 있다.
+# 그리고 첫번째 animate 처럼 수동으로 generator를 호출하는 것보다는 yield from을 쓰는 것이 속도가 더 빠르다.
+
+def move(period, speed):
+    for _ in range(period):
+        yield speed
+
+
+def pause(delay):
+    for _ in range(delay):
+        yield 0
+
+
+def animate():
+    for delta in move(4, 5.0):
+        yield delta
+    for delta in pause(3):
+        yield delta
+    for delta in move(2, 3.0):
+        yield delta
+
+
+def render(delta):
+    print(f"Delta: {delta:.1f}")
+
+
+def run(func):
+    for delta in func():
+        render(delta)
+
+
+run(animate)
+
+
+def animate():
+    yield from move(4, 5.0)
+    yield from pause(3)
+    yield from move(2, 3.0)
+
+
+run(animate)
+
+```
+
+**- Result**
+```text
+Delta: 5.0
+Delta: 5.0
+Delta: 5.0
+Delta: 5.0
+Delta: 0.0
+Delta: 0.0
+Delta: 0.0
+Delta: 3.0
+Delta: 3.0
+Delta: 5.0
+Delta: 5.0
+Delta: 5.0
+Delta: 5.0
+Delta: 0.0
+Delta: 0.0
+Delta: 0.0
+Delta: 3.0
+Delta: 3.0
+```
+
+<br>
+
+
+### 34. send로 제너레이터에 데이터를 주입하지 말라
+send를 사용할 경우 프로그램이 복잡해지므로 차라리 iterator를 넘겨라는 뜻으로 이해했다.
+근데 내가 보기엔 후자가 더 복잡하고 위험한게 아닌가 싶기도 하다. 
+저 예제 같은 경우에는 complex_wave_cascading에서 호출하는 yield 개수와 run_cascading 안에 있는 amplitudes의 개수가 다르면 StopIteration 에러를 발생시킨다. 물론 다듬어지지 않은 예제이기 때문에 그럴수도 있겠지만 저것 때문에 send를 포기하라는게 조금 납득이 되지 않기도 한다.
+
+그냥 yield from이랑 send를 같이 안쓰는 규칙이 더 좋지 않으련가..?
+
+**- Code**
+```python
+import math
+
+
+def wave(amplitude, steps):
+    step_size = 2 * math.pi / steps
+    for step in range(steps):
+        radians = step * step_size
+        fraction = math.sin(radians)
+        output = amplitude * fraction
+        yield output
+
+
+def complex_wave():
+    yield from wave(7.0, 3)
+    yield from wave(2.0, 4)
+    yield from wave(10.0, 5)
+
+
+def wave_modulating(steps):
+    step_size = 2 * math.pi / steps
+    amplitude = yield
+    for step in range(steps):
+        radians = step * step_size
+        fraction = math.sin(radians)
+        output = amplitude * fraction
+        amplitude = yield output
+
+
+def complex_wave_modulating():
+    yield from wave_modulating(3)
+    yield from wave_modulating(4)
+    yield from wave_modulating(5)
+
+
+def transmit(output):
+    if output is None:
+        print(f"출력: None")
+    else:
+        print(f"출력: {output:>5.1f}")
+
+
+def run(it):
+    for output in it:
+        transmit(output)
+
+
+def run_modulating(it):
+    amplitudes = [None, 7, 7, 7, 2, 2, 2, 2, 10, 10, 10, 10, 10]
+    for amplitude in amplitudes:
+        output = it.send(amplitude)
+        transmit(output)
+
+
+def wave_cascading(amplitude_it, steps):
+    step_size = 2 * math.pi / steps
+    for step in range(steps):
+        radians = step * step_size
+        fraction = math.sin(radians)
+        amplitude = next(amplitude_it)
+        output = amplitude * fraction
+        yield output
+
+
+def complex_wave_cascading(amplitude_it):
+    yield from wave_cascading(amplitude_it, 3)
+    yield from wave_cascading(amplitude_it, 4)
+    yield from wave_cascading(amplitude_it, 5)
+
+
+def run_cascading():
+    amplitudes = [7, 7, 7, 2, 2, 2, 2, 10, 10, 10, 10, 10]
+    it = complex_wave_cascading(iter(amplitudes))
+    for amplitude in amplitudes:
+        output = next(it)
+        transmit(output)
+
+
+# run(wave(3.0, 8))
+# run_modulating(wave_modulating(12))
+# run(complex_wave())
+# run_modulating(complex_wave_modulating())
+run_cascading()
+
+```
+
+**- Result**
+```text
+
+```
+
+<br>
+
+
+### 35. 제너레이터 안에서 throw로 상태를 변화시키지 말라
+
+**- Code**
+```python
+
+```
+
+**- Result**
+```text
+
+```
+
+<br>
+
 ### template
 
 **- Code**
@@ -299,3 +511,4 @@ TypeError: 컨테이너를 제공해야 합니다
 ```
 
 <br>
+
