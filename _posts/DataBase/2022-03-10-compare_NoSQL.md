@@ -1,8 +1,8 @@
 ---
 layout: single
 title:  "[DataBase][NoSQL] 분산 KVS, 와이드 컬럼 스토어, 도큐먼트 스토어, 검색엔진에 대해서 알아보자 - 01. 서론 및 분산 KVS"
-category: Database, NoSQL
-tag: Database, NoSQL
+category: [Database, NoSQL]
+tag: [Database, NoSQL]
 ---
 
 # 서두
