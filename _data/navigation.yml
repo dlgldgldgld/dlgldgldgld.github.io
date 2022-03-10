@@ -32,6 +32,8 @@ page_dir:
         url: /categories/Kafka/
       - title: "Airflow"
         url: /categories/Airflow/
+      - title: "Database"
+        url: /categories/Database/
   
   - title: OS
     children:
