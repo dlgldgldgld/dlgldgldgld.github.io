@@ -246,7 +246,7 @@ DAG('this_dag_will_not_too')
 
 위의 코드는 test 용으로 만들어본 DAG 파일이다. 해당 DAG 파일을 `importlib`을 통해 load 해서 `__dict__` 안의 key를 print 해보면 아래 이미지와 같이 나타남을 알 수 있다.
 
-![alt](../../_site/assets/images/2022-03-12-Airflow_How_To_Find_DAG/image1.png)
+![alt](../../assets/images/2022-03-12-Airflow_How_To_Find_DAG/image1.png)
 
 이제 Generator 에서는 어떤 결과가 나오는지에 대해 살펴보자
 
@@ -256,10 +256,10 @@ DAG('this_dag_will_not_too')
 
 ![alt](../../assets/images/2022-03-12-Airflow_How_To_Find_DAG/image2.png)
 
-# 결론
-해당 테스트에서 얻어낸 결론은 두가지다. 첫번째는 **<u>"dag 파일안에 dag과 airflow라는 키워드가 존재하지 않으면 안된다."</u>** 이고, 두번째는 **<u>"importlib을 통해 load된 dag module의 __dict__ 에 DAG()을 인스턴스로 가지고 있는 변수가 존재"</u>** 해야 한다는 것이다. 
+# 2. 결론
+해당 테스트에서 얻어낸 결론은 두가지다. 첫번째는 **<u>"dag 파일안에 dag과 airflow라는 키워드가 존재하지 않으면 안된다."</u>** 이고, 두번째는 **<u>"importlib을 통해 load된 dag module의 `__dict__` 에 DAG()을 인스턴스로 가지고 있는 변수가 존재"</u>** 해야 한다는 것이다. 
 
-첫번째는 명확하지만 두번째는 조금 더 알아볼 필요가 있다. __dict__ 안에 instance 변수가 포함이 되는 조건은 과연 무엇일까? 
+첫번째는 명확하지만 두번째는 조금 더 알아볼 필요가 있다. `__dict__`안에 instance 변수가 포함이 되는 조건은 과연 무엇일까? 
 
 위의 예제를 보면 my_function() 안에 들어가있는 DAG은 표시가 되지 않고 `DAG('this_dag_will_not_too')` 또한 표시가 되지 않는다. 
 
@@ -325,7 +325,7 @@ Disassembly of <code object my_function at 0x000001E9B95B4710, file "tutorial.py
 
 반면에 `dag_2`와 `DAG('this_dag_will_not_too')`는 어떠한가? `LOAD_CONST` 및 `STORE_FAST` 만 할뿐 `STORE_NAME`은 어디에서도 발생하지 않음을 알 수 있다.
 
-위의 사항들을 통해 유추해 봤을때 결국 **module을 import 했을때 사용이 가능한 변수들 = 전역 변수** 들에 대해서만 __dict__ 에 적재가 되고 있음을 추측 해볼 수 있다.
+위의 사항들을 통해 유추해 봤을때 결국 **module을 import 했을때 사용이 가능한 변수들 = 전역 변수** 들에 대해서만 `__dict__` 에 적재가 되고 있음을 추측 해볼 수 있다.
 
 결국 global 변수에 대해서는 모두 DAG으로 인식이 가능하다는 뜻으로 이해가 된다. 한번 테스트 해보자.
 
@@ -347,12 +347,12 @@ globals()['dag_4'] = DAG('is_possible_3')
 
 위의 코드는 다양한 전역변수 선언 방법들로 DAG을 생성한 코드이다. 해당 코드로 Generator 에서 어떤 결과를 출력하는지 체크해보자.
 
-![alt](../../_site/assets/images/2022-03-12-Airflow_How_To_Find_DAG/image3.png)
+![alt](../../assets/images/2022-03-12-Airflow_How_To_Find_DAG/image3.png)
 
 예상대로 DAG으로 인식되고 있음을 알 수 있다. **즉, Airflow에서는 전역변수로 DAG instance를 생성할 수 있다면 DAG으로 인식 가능하다는 것이 이번 실험이 결론**이 되겠다.
 
 
 <br>
 
-# 후기
+# 3. 후기
 테스트한 케이스들은 사실 실제 사용하는 상황과는 전혀 상관없기 때문에 실용성이 없는 테스트이긴 하다. 그래도 airbnb 개발팀에서 python을 어떻게 사용했었는지에 대해서 살짝 맛볼수가 있어서 좋은 경험이였던 것 같다. 당분간은 python을 꾸준히 사용해 볼 생각이다. 기회가 된다면 spark나 다른 오픈 소스들에 대해서도 코드를 찾아보고자 한다. 특히 MP 시스템이 어떻게 구현이 되어있는지에 대해 궁금하지 않을수가 없다. 다음번에는 좀 더 실용성있는 내용의 post를 적어보겠다 다짐한다! 
