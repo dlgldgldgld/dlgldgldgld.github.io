@@ -1,0 +1,271 @@
+---
+layout: single
+title:  "[파이썬 코딩의 기술 : Effective PYTHON 2ND 요약 및 코드 정리] CHAPTER 5. 클래스와 인터페이스"
+category: Python
+tag: Python
+---
+
+## CHAPTER 5. 클래스와 인터페이스
+
+### 37. 내장 타입을 여러 단계로 내포시키기보다는 클래스를 합성하라
+
+dict()을 통해서 학생들의 점수를 관리하는 프로그램이 있다고 하자. 
+여기에 과목별 점수, 과목별 점수 + 가중치 등등에 대해서도 관리가 가능하도록 프로그램 변경을 요청받았을때
+
+dict()을 통해 계속해서 위의 정보들을 추가하면 프로그램이 점점 복잡해진다.
+이를 방지하기 위해 클래스를 사용해 서로 합성할 수 있도록 모듈화를 시키고 필요에 따라서는 named tuple도 이용해서
+변경에 유연하게 대처할 수 있도록 구조를 만들어 나가라는 내용.
+
+<br>
+
+### 38. 간단한 인터페이스의 경우 클래스 대신 함수를 받아라
+
+제목만 보면 무슨소리인가 싶을 수도 있는데, defaultdict을 좀 더 python 스럽게 사용하는 방법에 대한 설명이다.
+defaultdict을 사용할때 첫번째 인자로 자료형대신에 함수도 넣을 수 있는데, 이에 대한 내용이다.
+
+예시로는 defaultdict에 function을 기본값으로 주고 거기에 부수 효과를 삽입할때 (키가 없는 경우가 몇번이였는지..?) 어떻게 구현해야하는가에 대한 best practice를 제시해준다.
+이 책을 통해 다시한번 느끼게 되는 것은 프로그래밍 언어도 의사 소통이 가능한 언어라는 것이다. 책 내용을 이해하기보다는 소스를 한번 보는 것이 내용 이해에 더 도움이 되는 것 같다. 번역을 디스하는게 아니냐고 물어본다면 그것이 맞다.
+
+**- Code**
+```python
+from collections import defaultdict
+
+def log_missing():
+    print('키 추가됨')
+    return 0
+
+current = {'초록' : 12, '파랑' : 3}
+increments = [
+    ('빨강', 5 ),
+    ('파랑', 17),
+    ('주황', 9),
+]
+
+# defaultdict은 함수로 보내서 return 값을 붙이는 형태로도 사용이 가능하다.
+# 두번째 인자에는 default 값을 넣어주는 것도 가능.
+result = defaultdict(log_missing, current)
+print('이전:', dict(result))
+for key, amount in increments :
+    result[key] += amount
+print('이후:', dict(result))
+
+# 여기서 키가 몇번 추가되었는지 체크를 하고 싶다면..?
+class BetterCountMissing:
+    def __init__(self):
+        self.added = 0
+
+    # __call__을 정의해서 callable 클래스로 만들어주자
+    def __call__(self):
+        self.added += 1
+        return 0
+
+# counter() 라고 호출하면 __call__ 함수를 통해 0이 return 됨을 알 수 있다.
+counter = BetterCountMissing()
+assert counter() == 0
+assert callable(counter)
+
+# 이것은 defaultdict에 넣으면 매번 call할때 self.added의 값이 +1 이 되므로 key 불일치 횟수를 쉽게 알수있다.
+counter = BetterCountMissing()
+result = defaultdict(counter, current)
+for key, amount in increments :
+    result[key] += amount
+assert counter.added == 2
+```
+
+**- Result**
+```text
+이전: {'초록': 12, '파랑': 3}
+키 추가됨
+키 추가됨
+이후: {'초록': 12, '파랑': 20, '빨강': 5, '주황': 9}
+```
+
+<br>
+
+### 39. 객체를 제너릭하게 구성하려면 @classmethod를 통한 다형성을 활용하라.
+
+예제에서는 map-reduce에 관한 구현을 예시로 들고있다.
+Worker와 InputData를 사용해서 이를 표현하려 했고 Worker는 InputData를 통해 파일을 받아오는 방식(read) 으로 구현이 되어있다.
+![alt](../../assets/images/2022-03-14-effective-python-ch05/이미지%201.png)
+
+아래 Code 1 을 보면 하위클래스들에 따라 매번 새로운 구현이 추가되어야해서 변경에 취약한 구조를 가지고 있다. 예를 들면 generate_inputs 함수나 create_workers 함수는 PathInputData와 LinecounterWorker를 직접 호출하기 때문이다.
+
+이를 좀 더 Generic하게 대응하기 위해서 책에서는 classmethod를 사용한 code2의 방식을 사용하도록 권장하고 있다.
+
+code 2는 부모 클래스 혹은 자식 클래스에 **classmethod를 사용해서 하위 클래스 자신을 반환할 수 있게**하는 구조로 되어있다. ( cls 사용하는 부분들을 참고 )
+
+**- Code 1.**
+```python
+class InputData:
+    def read(self):
+        raise NotImplementedError
+
+class PathInputData(InputData):
+    def __init__(self, path):
+        super().__init__()
+        self.path = path
+
+    def read(self):
+        with open(self.path) as f:
+            return f.read()
+
+class Worker:
+    def __init__(self, input_data):
+        self.input_data = input_data
+        self.result = None
+    
+    def map(self):
+        raise NotImplementedError
+
+    def reduce(self, other):
+        raise NotImplementedError
+
+class LineCountWorker(Worker):
+    def map(self):
+        data = self.input_data.read()
+        self.result = data.count('\n')
+
+    def reduce(self, other):
+        self.result += other.result
+
+
+import os
+
+def generate_inputs(data_dir):
+    for name in os.listdir(data_dir):
+        yield PathInputData(os.path.join(data_dir,name))
+
+def create_workers(input_list):
+    workers = []
+    for input_data in input_list:
+        workers.append(LineCountWorker(input_data))
+    return workers
+
+from threading import Thread
+
+def execute(workers):
+    threads = [Thread(target=w.map) for w in workers ]
+    for thread in threads: thread.start()
+    for thread in threads: thread.join()
+
+    first, *rest = workers
+    for worker in rest:
+        first.reduce(worker)
+    return first.result
+
+def mapreduce(data_dir):
+    inputs = generate_inputs(data_dir)
+    workers = create_workers(inputs)
+    return execute(workers)
+
+import random
+import shutil
+def write_test_files(tmpdir):
+    if os.path.exists(tmpdir):
+        shutil.rmtree(tmpdir)
+    
+    os.makedirs(tmpdir)
+    for i in range(100):
+        with open(os.path.join(tmpdir, str(i)), 'w') as f:
+            f.write('\n' * random.randint(0,100))
+
+
+tmpdir = 'test_inputs'
+write_test_files(tmpdir)
+
+result = mapreduce(tmpdir)
+print(f'총 {result} 줄이 있습니다.')
+
+```
+
+**- Code 2.**
+```python
+import os
+from threading import Thread
+
+class GenericInputData:
+    def read(self):
+        raise NotImplementedError
+
+    @classmethod
+    def generate_inputs(cls, config):
+        raise NotImplementedError
+
+class PathInputData(GenericInputData):
+    def __init__(self, path):
+        super().__init__()
+        self.path = path
+
+    def read(self):
+        with open(self.path) as f:
+            return f.read()
+
+    @classmethod
+    def generate_inputs(cls, config):
+        data_dir = config['data_dir']
+        for name in os.listdir(data_dir):
+            yield cls(os.path.join(data_dir, name))
+
+class GenericWorker:
+    def __init__(self, input_data):
+        self.input_data = input_data
+        self.result = None
+
+    def map(self):
+        raise NotImplementedError
+
+    def reduce(self):
+        raise NotImplementedError
+
+    @classmethod
+    def create_workers(cls, input_class, config):
+        workers=[]
+        for input_data in input_class.generate_inputs(config):
+            workers.append(cls(input_data))
+        return workers
+
+class LineCounterWorker(GenericWorker):
+    def map(self):
+        data = self.input_data.read()
+        self.result = data.count('\n')
+
+    def reduce(self, other):
+        self.result += other.result
+
+def execute(workers):
+    threads = [Thread(target=w.map) for w in workers ]
+    for thread in threads: thread.start()
+    for thread in threads: thread.join()
+
+    first, *rest = workers
+    for worker in rest:
+        first.reduce(worker)
+    return first.result
+
+def mapreduce(worker_class, input_class, config):
+    workers = worker_class.create_workers(input_class, config)
+    return execute(workers)
+
+tmpdir = 'test_inputs'
+config = {'data_dir' : tmpdir}
+result = mapreduce(LineCounterWorker, PathInputData, config)
+print(f'총 {result} 줄이 있습니다.')
+
+```
+
+<br>
+
+
+### xx. Template
+
+**- Code**
+```python
+
+```
+
+**- Result**
+```text
+
+```
+
+<br>
