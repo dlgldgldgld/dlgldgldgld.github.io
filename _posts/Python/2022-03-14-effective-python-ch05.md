@@ -255,6 +255,86 @@ print(f'총 {result} 줄이 있습니다.')
 
 <br>
 
+### 40. super로 부모 클래스를 초기화하라
+클래스를 상속을 받았을때 부모 클래스를 초기화하는 방식은 두가지가 있다.
+첫번째는 super()를 사용하는 방법, 두번째는 부모 클래스의 `__init__` 을 직접 호출하는 방식이다.
+
+해당 장에서는 두번째 방식으로 호출했을때의 문제점과 super()를 사용하지 않았을때 발생할 수 있는 여러 문제점들에 대해서 예시로 제시해준다.
+
+**- Code**
+```python
+class MyBaseClass:
+    def __init__(self, value):
+        self.value = value
+
+class TimesSevenCorrect(MyBaseClass):
+    def __init__(self, value):
+        super().__init__(value)
+        self.value *= 7
+
+class PlusNineCorrect(MyBaseClass):
+    def __init__(self, value):
+        super().__init__(value)
+        self.value += 9
+
+class GoodWay(TimesSevenCorrect, PlusNineCorrect):
+    def __init__(self, value):
+        super().__init__(value)
+
+foo = GoodWay(5)
+print("Times Seven Correct -> PlusNineCorrect 순으로 했으니 (5*7)+9 = 45가 나와야할 것 같다.")
+print(f"하지만 답은? {foo.value=}")
+
+mro_str = ', '.join(repr(cls) for cls in GoodWay.mro())
+print("__init__의 호출순서:", mro_str)
+
+# 호출순서: <class '__main__.GoodWay'>,<class '__main__.TimesSevenCorrect'>,<class '__main__.PlusNineCorrect'>,<class 
+# '__main__.MyBaseClass'>,<class 'object'>
+
+# 인자로 넘긴 것의 뒤에서부터 앞으로 계산이 되기 때문에 5*(7+9) = 89가 되는 것임!
+```
+
+**- Result**
+```text
+Times Seven Correct -> PlusNineCorrect 순으로 했으니 (5*7)+9 = 45가 나와야할 것 같다.
+하지만 답은? foo.value=98
+호출순서: <class '__main__.GoodWay'>,<class '__main__.TimesSevenCorrect'>,<class '__main__.PlusNineCorrect'>,<class 
+'__main__.MyBaseClass'>,<class 'object'>
+```
+
+<br>
+
+### 41. 기능을 합성할 때는 믹스인 클래스를 사용하라
+무슨 말을 하려고 하는지는 모르겠음. 이해하기가 너무 어려워서 패스.
+
+<br>
+
+### 42. 비공개 애트리뷰트보다는 공개 애트리뷰트를 사용하라
+파이썬에서는 변수 앞에 `__` 을 붙임으로써 attribute의 private을 제공한다. 
+원리는 간단하다. `self.__private_field` 라고 선언을 한다면 이것을 `ClassName__private_field` 로 바꿔서 기존 변수의 이름으로는 접근하지 못하도록 한다.
+
+![alt](../../assets/images/2022-03-14-effective-python-ch05/image2.png)
+
+그래서 위의 규칙만 알고있다면 private이 비공개가 아니게 된다는 점이다. 이런 특이사항은 python의 motto인 *"우리는 모두 책임질줄 아는 성인이다"* 으로 인해 생긴 것이라고 한다.
+
+private으로 막아두면 나중에 다른 사람들이 필요할때 아예 사용 자체를 못하게 되어서 그건 아니라고 판단되서 이렇게 했다고 한다. 대신에 protected_field를 사용해서 "이 필드를 사용할 경우에는 조심해야 한다." 는 의미를 남긴다. 물론 이는 PEP-8 스타일 가이드의 관례적 사용법이다.
+
+책에서는 private을 사용한다면 공개 API에 있는 것을 한정으로만 사용하라고 명시되어 있다. 공개 API는 사용자가 직접 수정하는 것이 어려우므로, 해당 클래스를 상속했을때 naming이 겹치는 문제를 방지하기 위해 이를 사용하라고 권장하고 있다.
+
+결론만 말하자면 공개하고 싶지 않은 정보는 private 대신 protected를 사용하고 하위 클래스에서 name 충돌을 발생시키지 말아야하는 경우에 대해서만 private를 사용할 궛을 권한다.
+
+**- Code**
+```python
+
+```
+
+**- Result**
+```text
+
+```
+
+<br>
+
 
 ### xx. Template
 
