@@ -323,18 +323,42 @@ private으로 막아두면 나중에 다른 사람들이 필요할때 아예 사
 
 결론만 말하자면 공개하고 싶지 않은 정보는 private 대신 protected를 사용하고 하위 클래스에서 name 충돌을 발생시키지 말아야하는 경우에 대해서만 private를 사용할 궛을 권한다.
 
+<br>
+
+### 43. 커스텀 컨테이너 타입은 collections.abc를 상속하라
+
+python에서는 컨테이너를 상속받아서 기능 구현을 하는 일이 많다고 한다.
+예를 들면 본래의 list에서 index 기능이 제공되지 않는다고 가정하면, list를 상속받아 이와 관련된 func을 추가하는 방식 등으로 말이다.
+
+아래 이미지와 같이 list 처럼 index 기능을 구현하고 싶다면 magic method인 `__getitem__`을 구현해야 한다.
+
+![alt](../../assets/images/2022-03-14-effective-python-ch05/image_3.png)
+
+이같이 Custom Container Class를 만들고 싶을때는 collections의 abc를 사용해 구현에 필요한 인터페이스를 상속받는 것이 좋다. 해당 모듈에 있는 인터페이스를 상속 받은 후, 구현을 하지 않으면 에러가 발생하기 때문에 사전에 문제 발생을 차단할 수 있다.
+
+상세 항목들에 대해서는 아래의 링크를 참조하자.
+
+collection.abc : [https://docs.python.org/ko/3/library/collections.abc.html#collections-abstract-base-classes](https://docs.python.org/ko/3/library/collections.abc.html#collections-abstract-base-classes)
+
 **- Code**
 ```python
+from collections.abc import Sequence
 
+class badType(Sequence):
+    pass
+
+foo = badType()
 ```
 
 **- Result**
 ```text
-
+Traceback (most recent call last):
+  File "d:\test\hello.py", line 6, in <module>
+    foo = badType()
+TypeError: Can't instantiate abstract class badType with abstract methods __getitem__, __len__
 ```
 
 <br>
-
 
 ### xx. Template
 
