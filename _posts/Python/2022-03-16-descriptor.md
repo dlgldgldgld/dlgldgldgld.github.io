@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "[PYTHON] - Descripter"
+title:  "[PYTHON] - Descriptor"
 category: Python
 tag: Python
 ---
@@ -54,10 +54,10 @@ print(f'{var.val=}')
 
 예를 들어 val 변수를 다른 클래스에도 가져다 쓰고 싶다고 하면 그건 방법이 없다. 그 클래스에도 @property로 val을 추가하는 방안밖에 없는 것이다.
 
-그래서 임의의 필드를 재사용 가능하도록 하는 것이 @property를 구현할때 사용한 descripter 라는 개념인데 이에 대해서 알아보도록 하자.
+그래서 임의의 필드를 재사용 가능하도록 하는 것이 @property를 구현할때 사용한 Descriptor 라는 개념인데 이에 대해서 알아보도록 하자.
 
-# Descripter
-Descripter의 기본 정의는 어떤 객체의 attribute 조회, 저장 및 삭제를 사용자가 직접 정의할 수 있도록 해주는 class 이다.
+# Descriptor
+Descriptor 기본 정의는 어떤 객체의 attribute 조회, 저장 및 삭제를 사용자가 직접 정의할 수 있도록 해주는 class 이다.
 
 예를 들자면 int나 float 같은 자료형은 해당 클래스가 제공해주는 기본 옵션으로만 값을 저장할 수 있다. 허나 사용자는 음수에 대해서는 허용을 하고 싶지 않던가, 조회의 기준을 python 객체가 아닌 sqlite 내부의 table에 대해서 하고 싶은 등 (이런 것을 ORM 이라고 한다.) 다양한 상황에 대한 attribute 정의를 내리고 싶을때가 있다.
 
@@ -151,7 +151,6 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 class LoggedAccess:
-
     def __set_name__(self, owner, name):
         self.public_name = name
         self.private_name = '_' + name
@@ -166,17 +165,37 @@ class LoggedAccess:
         setattr(obj, self.private_name, value)
 
 class Person:
-
+    key = 'title'
     name = LoggedAccess()                # First descriptor instance
     age = LoggedAccess()                 # Second descriptor instance
 
     def __init__(self, name, age):
         self.name = name                 # Calls the first descriptor
         self.age = age                   # Calls the second descriptor
+        self.key = 'Person'
 
     def birthday(self):
         self.age += 1
+
+pete = Person('Peter P', 10)
+kate = Person('Catherine C', 20)
+
+print(vars(pete))
+
+>> INFO:root:Updating 'name' to 'Peter P'
+>> INFO:root:Updating 'age' to 10
+>> INFO:root:Updating 'name' to 'Catherine C'       
+>> INFO:root:Updating 'age' to 20
+>> {'_name': 'Peter P', '_age': 10, 'key': 'Person'}
 ```
 
-기본 개요는 이 정도면 충분한 것 같고, 더 세부내용을 알고싶다면 [https://docs.python.org/ko/3/howto/descriptor.html#](https://docs.python.org/ko/3/howto/descriptor.html#) 을 참고하길 바란다.
+위의 코드를 보면 한가지 의문점이 들수 있다. Person 객체의 변수들을 자세히보면 class 변수와 instance 변수가 모두 일치한다. 
+
+근데 이상한 것은 Descriptor로 선언된 것은 self.name에서 Descriptor를 호출하고 str로 선언된 key는 instnace 변수가 사용되고 있음을 알 수 있는데 이는 호출의 우선 순위가 있기 때문이다.
+
+이는 [invocation-from-an-instance](https://docs.python.org/ko/3/howto/descriptor.html#invocation-from-an-instance)를 보면 알 수 있는데 변수를 검색할때 우선순위가 descriptor -> instance variable -> non-data descriptor -> class variable 순으로 탐색을 하기 때문이다. 
+
+그래서 만약 변수명을 동일하게 구성하고 싶은 경우에는 이를 반드시 알고 있어야 한다.
+
+기본 개요는 이 정도면 충분한 것 같아서 글은 여기서 마치도록 하겠다. 추가적인 세부내용을 알고싶다면 [https://docs.python.org/ko/3/howto/descriptor.html#](https://docs.python.org/ko/3/howto/descriptor.html#)을 참고하길 바란다.
 
