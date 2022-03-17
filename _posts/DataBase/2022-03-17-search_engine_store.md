@@ -68,8 +68,69 @@ ElaticSearch 강의 : <https://www.youtube.com/playlist?list=PLVNY1HnUlO25m5tT06
 
 <br>
 
-### 명령어 모음
-[ElasticSearch 문법 정리](https://github.com/dlgldgldgld/ELK-Tutorial#elasticsearch---%EB%AC%B8%EB%B2%95)에 정리
+## ElasticSearch 명령어 모음
+
+### Service 실행 / 종료
+- 실행 : sudo service elasticsearch start
+- 종료 : sudo service elasticsearch stop
+
+### Index 제거
+- curl -XDELETE http://localhost:9200/classes 
+
+### Index 생성
+- curl -XPUT http://localhost:9200/classes
+
+### Index 조회
+- curl -XGET http://localhost:9200/classes
+
+### Document 조회
+- id 선택 : curl -XGET http://localhost:9200/classes/class/2
+- 전체 조회 : curl -XGET http://localhost:9200/classes/class/_search?pretty
+- 조건 부 조회 : curl -XGET 'http://localhost:9200/classes/class/_search?q=Professor:Eric%20Clapton&pretty'
+  - 공백은 '%20'을 포함시키면 됨.
+- REQUEST Body를 통해 전달
+  - curl -XGET http://localhost:9200/classes/class/_search?pretty -d '{ "query" : { "match" : { "major" : "Music" } } }' -H 'Content-Type: application/json'
+  - https://www.elastic.co/guide/en/elasticsearch/reference/current/search-fields.html#docvalue-fields 참조
+
+### Document 삽입
+- curl -XPOST http://localhost:9200/classes/class/1 -H 'Content-Type: application/json' -d '{"title":"Algorithm", "professor":"John"}'
+- curl -XPOST http://localhost:9200/classes/class/1/_update -d '{"doc" : {"unit" : 1 }}' -H 'Content-Type: application/json'
+- curl -XPOST http://localhost:9200/classes/class/1/_update -d '{"doc" : {"unit" : 2 }}' -H 'Content-Type: application/json'
+- curl -XPOST http://localhost:9200/classes/class/1/_update -d '{"script" : "ctx._source.unit+=5" }' -H 'Content-Type: application/json'
+
+### Bulk Insert
+- curl -XPOST http://localhost:9200/_bulk?pretty --data-binary @classes.json -H 'Content-Type: application/json'
+
+단, 파일은 아래와 같이 _index, _type, _id 에 대해서 명시되어 있어야함.
+{ "index" : { "_index" : "classes", "_type" : "class", "_id" : "1" } }
+{"title" : "Machine Learning","Professor" : "Minsuk Heo","major" : "Computer Science","semester" : ["spring", "fall"],"student_count" : 100,"unit" : 3,"rating" : 5, "submit_date" : "2016-01-02", "school_location" : {"lat" : 36.00, "lon" : -120.00}}
+
+### Mapping
+- curl -XPUT 'http://localhost:9200/classes/class/_mapping?include_type_name=true&pretty' -d @classesRating_mapping.json -H 'Content-Type: application/json'
+
+### Aggregation
+- curl -XGET 'http://localhost:9200/_search?pretty' --data-binary @avg_points_aggs.json -H 'Content-Type: application/json'
+- 아래 json 파일을 기준으로 인자를 설명하면 다음과 같다.
+  - size : document(record) 출력 개수, 0으로 하면 표시되지 않음
+  - aggs : 집계
+  - avg_score : 집계 값의 명칭
+  - avg : 평균을 내겠다는 의미, 이 위치에는 max, min, sum 등등 다른것들도 들어갈 수 있음.
+    - stats를 입력하면 min, max, mavg, sum, count 모두 표시됨.
+  - field : 평균을 구할 property 값
+    ```json
+    {
+      "size" : 0,
+      "aggs" : {
+        "avg_score" : {
+          "avg" : {
+            "field" : "points"
+          }
+        }
+      }
+    }
+    ```
+- group by를 이용하려면 "terms", "aggs" 키워드를 동시에 사용.
+  - https://github.com/dlgldgldgld/ELK-Tutorial/blob/d1278f41f610c86fe7bbf279c04ab0fb068744c6/ch04/stats_by_team.json
 
 <br>
 
