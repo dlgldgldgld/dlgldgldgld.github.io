@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "Kafka의 기본 개념과 구조"
+title:  "[Kafka] - 01. 카프카 기본 개념과 구조"
 category: Kafka
 tag: Kafka
 ---
