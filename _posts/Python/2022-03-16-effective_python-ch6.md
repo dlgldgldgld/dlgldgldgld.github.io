@@ -284,17 +284,148 @@ assert isinstance(rubby, Polygon)
 
 <br>
 
+### 49. `__init_subclass__`를 사용해 클래스 확장을 등록하라
+"48. `__init_subclass__`를 사용해 하위 클래스를 검증하라" 와 비슷한 내용이다.
+Python을 사용할때 간단한 식별자를 이용해 그에 해당하는 클래스를 찾는 역검색을 하고 싶을때가 있다고 한다.  
+이럴때 사용하는 것이 메타클래스를 사용해 타입을 자동으로 등록하는 것이다.  
 
-### xx. Template
+하지만 메타클래스는 사용하기가 조금 까다로운 면이 있어서 그럴바에는 `__init_subclass__`를 사용하라는 내용이다.  
+아래의 코드를 참고하자.
 
 **- Code**
 ```python
+import json
+
+registry = {}
+
+def register_class(target_class):
+    registry[target_class.__name__] = target_class
+
+# deserialize 함수가 제대로 동작하려면 항상 register_class를 통해 클래스를 등록해야한다.
+# 만약 register_class를 호출하지 않을 경우 에러가 발생하게 된다. => 등록하는 걸 깜빡할 수 있기 때문에 위험.
+def deserialize(data):
+    params = json.loads(data)
+    name = params['class']
+    target_class = registry[name]
+    return target_class(*params['args'])
+
+
+class BetterSerializable:
+    def __init__(self, *args):
+        self.args = args
+
+    def serialize(self):
+        return json.dumps({
+            'class': self.__class__.__name__,
+            'args': self.args,
+        })
+
+    def __repr__(self):
+        name = self.__class__.__name__
+        args_str = ', '.join(str(x) for x in self.args)
+        return f'{name}({args_str})'
+
+# register_class를 매번 호출하기 위해 상위클래스를 하나 만들고 _init_subclass__ 를 사용해서 regsiter_class 호출을 자동화하자.
+class BetterRegisteredSerializable(BetterSerializable):
+    def __init_subclass__(cls):
+        super().__init_subclass__()
+        register_class(cls)
+
+
+class Vector1D(BetterRegisteredSerializable):
+    def __init__(self, magnitude):
+        super().__init__(magnitude)
+        self.magnitude = magnitude
+
+before = Vector1D(6)
+print('이전:', before)
+data = before.serialize()
+print('직렬화한 값', data)
+print('이후:', deserialize(data))
+```
+
+**- Result**
+```text
+이전: Vector1D(6)
+직렬화한 값 {"class": "Vector1D", "args": [6]}
+이후: Vector1D(6)
+```
+
+<br>
+
+### 50. `__set_name__`으로 클래스 애트리뷰트를 표시하라
+<https://dlgldgldgld.github.io/python/descriptor/#descriptor> 에 있는 `__set_name__`에 관한 설명이다.
+
+<br>
+
+### 51. 합성 가능한 클래스 확장이 필요하면 메타클래스보다는 클래스 데코레이터를 사용하라
+클래스에 확장 기능을 넣고 싶은 경우 메타클래스를 쓰지말고 클래스 데코레이터를 사용하라는 내용이다.
+책에 있는 예제가 너무 과한 것 같긴한데 메타클래스로 아래의 소스를 짜려고 하면 고생이 이만저만 하니깐 클래스 데코레이터로 간단하게 하라는 의미다.
+
+**- Code**
+```python
+import types
+from functools import wraps
+
+def trace_func(func):
+    if hasattr(func, 'tracing'):
+        return func
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        result = None
+        try:
+            result = func(*args, **kwargs)
+            return result
+        except Exception as e:
+            result = e
+            raise
+        finally:
+            print(f'{func.__name__}({args!r}, {kwargs!r}) -> ' 
+                  f'{result!r}')
+
+    wrapper.tracing = True
+    return wrapper
+
+trace_types = (
+    types.MethodType,
+    types.FunctionType,
+    types.BuiltinFunctionType,
+    types.BuiltinMethodType,
+    types.MethodDescriptorType,
+    types.ClassMethodDescriptorType)
+
+def trace(klass):
+    for key in dir(klass):
+        value = getattr(klass, key)
+        if isinstance(value, trace_types):
+            wrapped = trace_func(value)
+            setattr(klass, key, wrapped)
+
+    return klass 
+
+@trace
+class TraceDict(dict):
+    pass
+
+
+trace_dict = TraceDict([('안녕', 1)])
+trace_dict['거기'] = 2
+trace_dict['안녕']
+
+try:
+    trace_dict['not exists']
+except KeyError:
+    pass
+
 
 ```
 
 **- Result**
 ```text
-
+__new__((<class '__main__.TraceDict'>, [('안녕', 1)]), {}) -> {}
+__getitem__(({'안녕': 1, '거기': 2}, '안녕'), {}) -> 1
+__getitem__(({'안녕': 1, '거기': 2}, 'not exists'), {}) -> KeyError('not exists')
 ```
 
 <br>
