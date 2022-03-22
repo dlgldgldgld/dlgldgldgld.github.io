@@ -75,7 +75,7 @@ ISR은 메시지를 기준으로 동기화가 이뤄지게 됩니다. **그래�
 위와 같이 Leader와 Follower 파티션 간의 sync를 맞추기 위해서 **하이워터마크**를 사용합니다. 이는 각 파티션이 동일한 Message를 가지고 있다는 것을 뜻합니다.  
 
 이는 다음과 같은 과정을 거쳐 **각각의 broker들로 부터 관리**됩니다.  
-![alt](../../_site/assets/images/2022-03-22-kafka-detail-impl/high_watermark.png)  
+![alt](../../assets/images/2022-03-22-kafka-detail-impl/high_watermark.png)  
 1. broker1(Leader) message2를 전달 받음.  
 2. broker2(Follower)에서 mesasge1을 받고 message2를 Leader에 요청.  
 3. broker2(Follower)에서 mesasge1을 받고 message2를 Leader에 요청.  
