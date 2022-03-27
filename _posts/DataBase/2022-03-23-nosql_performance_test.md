@@ -17,7 +17,7 @@ tag: [Database, NoSQL]
 
 # 1. RDBMS vs Key-Value Store 성능 비교
 
-첫번째로 Key-Value Store와 RDBMS 사이에 어떠한 차이가 있는지에 대해서 비교를 해보고자 한다.  
+첫번째로 Key-Value Store와 RDBMS 사이에 어떠한 차이가 있는지에 대해서 비교를 해보자.  
 Key-Value Store의 장점은 <u>Key별로 빠르게 데이터를 Read 하거나 Write를 할 수 있다는 점</u>이다.  
 예를 들면 유저정보와 같이 Key를 통해서 데이터를 빠르게 주고받아야 할때 강점을 발휘한다.
 
