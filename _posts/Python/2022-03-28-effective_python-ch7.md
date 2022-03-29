@@ -78,3 +78,55 @@ b'b\x05\xa4\x8eT1\x19\x18\x14\xd0'
 b'\xb9\xa4\xa7*\x8e\xee\x10\x80\\\xbe'
 b'\xd0\xe9\xa1?\xc3[\xf4d\xbe\xda'
 ```
+
+## 53. 블로킹 I/O의 경우 스레드를 사용하고 병렬성을 피하라
+Python은 코드 실행시 GIL(Global interpreter Lock)을 사용하기 때문에,  
+Thread 사용시 일반적인 경우에 다른 언어들이 취할 수 있는 이점을 취할 수 없다. 
+
+단 한가지 이점이 생길 수 있는 경우가 있는데, 그것은 Blocking I/O가 진행될때이다.  
+이 때는 CPU Bound Task가 아니기 때문에 switching이 많이 발생하지 않아 문제가 되지 않는다.  
+
+`coroutine`, `asyncio` 같은 다른 대안들도 있으나 Threading이 직관적이기 때문에 Blocking I/O 사용시에만 Thread를 사용하자.  
+
+```python
+def factorize(number):
+    for i in range(1, number + 1):
+        if number % i == 0:
+            yield i
+
+import time
+
+numbers=[2139079, 1214759, 1516637, 1852285]
+start = time.time()
+
+for number in numbers:
+    list(factorize(number))
+
+end = time.time()
+delta = end - start
+print(f'{delta=:.3f}')
+
+from threading import Thread
+class FactorizeThread(Thread):
+    def __init__(self, number):
+        super().__init__()
+        self.number = number
+
+    def run(self):
+        self.factors = list(factorize(self.number))
+
+start = time.time()
+
+threads = []
+for number in numbers:
+    thread = FactorizeThread(number)
+    thread.start()
+    threads.append(thread)
+
+for thread in threads:
+    thread.join()
+
+end = time.time()
+delta = end - start
+print(f'{delta=:.3f}')
+```
