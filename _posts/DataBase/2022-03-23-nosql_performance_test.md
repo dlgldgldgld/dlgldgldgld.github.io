@@ -13,7 +13,21 @@ tag: [Database, NoSQL]
 
 이번 POST에서는 **RDB(SQLITE) + NoSQL(분산 KVS, WCS, Document Store, Search Engine)간에 성능 테스트**를 주제로 글을 작성해 보고자 한다. 
 
-다양한 케이스별로 얼마만큼의 성능이 나오는지 간단하게 체크를 해보자.
+Document Store의 경우에는 schemaless한 데이터들을 유연하게 적재할 수 있다는게 장점이기 때문에 성능 비교와는 거리가 먼 것 같아서 제외하도록 한다.  
+
+Performance 측정은 RDBMS에서도 가능하고 NoSQL에서도 가능한 목록들에 대해서 한번 체크를 해보려고 한다.
+
+떠오르는 것들은 다음과 같다.
+
+|index|RDBMS|NoSQL|What?|
+|----|----|----|----|
+|1|SQLITE-Index|KVS(DynamoDB, Cassandra)|Read/Write 속도 비교|
+|2|SQLITE-FTS|SearchEngine(ElasticSearch)|검색 속도 비교|
+
+하나씩 차례대로 확인해보자.
+
+----
+<br>
 
 # 1. RDBMS vs Key-Value Store 성능 비교
 
@@ -60,6 +74,8 @@ RDBMS는 SQLITE, Key-Value Store는 Apache Cassandra를 사용해 Test를 진행
 ### Test 1-1. Write Test
 개수별로 차이가 있을 수 있어 이를 고려하여 100만, 500만, 1000만 rows를 대상으로 테스트해보았다. 
 
+![alt](../../../assets/images/2022-03-18-nosql_performance_test/per_records.png)
+
 100만 rows를 write 할때는 속도가 크게 차이가 나지 않지만,  
 **1000만 rows에서는 SQLITE가 무려 1.5배**나 느린 것으로 확인되었다.  
 
@@ -67,22 +83,33 @@ RDBMS는 SQLITE, Key-Value Store는 Apache Cassandra를 사용해 Test를 진행
 
 이를 인용하면 일반 RDBMS보다는 cassandra에 Write를 하는 것이 더 빠르다고 볼 수 있을 것 같다.
 
-![alt](../../../assets/images/2022-03-18-nosql_performance_test/per_records.png)
+아래 표를 보면 sqlite(no-index)의 경우가 가장빠르지만 실제 운영 환경에서는 read 속도를 위해 index를 생성할 것이므로 무시해도 될 것 같다. 
 
 ----
 
 ### Test 1-2. Read Test
 다음은 Read Test를 진행해보았다.  
-1000만 rows를 기준으로 read test시에는 속도가 거의 비슷하게 나왔다.  
-sqlite3에서는 1~4 ms를 유지하고, Cassandra에서는 3ms를 유지하고 있다.
-
-Read 속도는 큰 차이가 없는 것으로 확인된다.
-
-`Query : select * from client_info where user_id = '7888a4bc-51c8-42a3-9f73-2b898a0a14e6'`
-
 
 |Case|소요시간(sec)|image|
 |----|----|----|
 |SQLITE3 Read 1 record(No Index)|1760 ms|![alt](../../../assets/images/2022-03-18-nosql_performance_test/TEST1_2_SQLITE_NOINDEX.png)|
 |SQLITE3 Read 1 record(Index)|1~4 ms|![alt](../../../assets/images/2022-03-18-nosql_performance_test/TEST1_2_SQLITE_INDEX.png)|
 |CASSANDRA Read 1 record|3 ms|![alt](../../../assets/images/2022-03-18-nosql_performance_test/TEST1_2_CASSANDRA.png)|
+
+1000만 rows를 기준으로 read test시에는 속도가 거의 비슷하게 나왔다.  
+sqlite3에서는 1~4 ms를 유지하고, Cassandra에서는 3ms를 유지하고 있다.
+
+Read 속도는 큰 차이가 없는 것으로 확인된다.  
+sqlite에서 index가 없는 경우에는 무려 1.7초나 걸린다.
+
+`Query : select * from client_info where user_id = '7888a4bc-51c8-42a3-9f73-2b898a0a14e6'`
+
+----
+<br>
+
+# 2. ElasticSerach VS SQLITE-FTS 성능 비교
+
+## evaluation
+1. 검색 속도
+2. 
+
