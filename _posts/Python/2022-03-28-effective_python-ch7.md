@@ -130,3 +130,65 @@ end = time.time()
 delta = end - start
 print(f'{delta=:.3f}')
 ```
+
+## 54. 스레드에서 데이터 경합을 피하기 위해 Lock을 사용하라
+앞서 언급된 GIL로 인해서 보통의 경우에도 Thread safe가 보장된다고 생각한다면 그렇지 않다.  
+물론 어느정도 보장이 되는 컨테이너도 있을 수 있지만 그렇지 않다.
+
+이것은 `+=` 연산 도중 내부 동작은 여러가지로 나뉘게 되는데 이때 thread별 ProgramCounter는 thread 시작시 트랜잭션 처리되지 않기 때문에 switching 발생시에 mutex 보장을 해주지 않기 떄문이다. GIL은 refer counter 등을 보장해줄 뿐 실제 이런 연산에 대해서는 thread safe 하게 동작되지 않는다.  
+
+그래서 Lock을 사용해서 mutex를 걸어주면 data 영역에 대해서 thread safe를 보장해준다.  
+
+```python
+from threading import Thread
+
+class Counter:
+    def __init__(self):
+        self.count = 0
+    
+    def increment(self, offset):
+        self.count += offset
+
+def worker(sensor_index, how_many, counter):
+    for _ in range(how_many):
+        counter.increment(1)
+
+
+how_many = 10**6
+counter = Counter()
+
+threads = []
+for i in range(5):
+    thread = Thread(target=worker, 
+                    args=(i, how_many, counter))
+    threads.append(thread)
+    thread.start()
+
+for thread in threads:
+    thread.join()
+
+expected = how_many * 5
+found = counter.count
+print(f'{expected=}, {found=}')
+```
+
+```text
+expected=5000000, found=2988814
+```
+
+```python
+from threading import Thread, Lock
+
+class Counter:
+    def __init__(self):
+        self.lock = Lock()
+        self.count = 0
+    
+    def increment(self, offset):
+        with self.lock:
+            self.count += offset
+```
+
+```text
+expected=5000000, found=5000000
+```
