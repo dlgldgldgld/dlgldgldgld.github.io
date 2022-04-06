@@ -238,3 +238,56 @@ Thread 보다는 낫다고 하는데 개인적으로는 후자가 더 알아보�
 확장성이 좋아지긴 하지만 기존 코드를 리팩터링 하려면 상당히 많은 작업이 필요하고, 특히 다단계로 이뤄진 파이프라인이 필요하면 작업량이 늘어난다.
 
 다음장은 이러한 단점이 모두 보안된 `concurrent.futures` 라는 모듈에 대해서 살펴본다.
+
+## 59. 동시성을 위해 스레드가 필요한 경우에는 ThreadpoolExecutor를 사용하라
+
+Python에서는 위와 같은 단점들을 보완한 `concurrent.future` 모듈의 `ThreadpoolExecutor` 라는 클래스가 존재한다.
+
+해당 클래스는 사용하기도 쉬울 뿐더러 위에서 나온 문제점들을 모두 보완한다.
+
+1. Executor 개수 제한 => max_worker 인자 사용
+2. Error 처리 => result() 함수로 결과를 받아올 수 있음.
+
+이를 통해 처리한 소스는 다음과 같다.
+
+```python
+from concurrent.futures import ThreadPoolExecutor
+
+def simulate_pool(pool, grid):
+    next_grid = LockingGrid(grid.height, grid.width)
+    futures = []
+    for y in range(grid.height):
+        for x in range(grid.width):
+            args = (y, x, grid.get, next_grid.set)
+            future = pool.submit(step_cell, *args)  # 팬아웃
+            futures.append(future)
+
+    for future in futures:
+        future.result()  # 팬인
+
+    return next_grid
+
+grid = Grid(5, 9)
+grid.set(0, 3, ALIVE)
+grid.set(1, 4, ALIVE)
+grid.set(2, 2, ALIVE)
+grid.set(2, 3, ALIVE)
+grid.set(2, 4, ALIVE)
+
+columns = ColumnPrinter()
+with ThreadPoolExecutor(max_workers=10) as pool:
+    for i in range(5):
+        columns.append(str(grid))
+        grid = simulate_pool(pool, grid)
+
+print(columns)
+```
+
+좀 더 자세한 내용에 관해서 알아보고 싶다면 아래 링크를 참조하자.  
+<https://docs.python.org/ko/3.7/library/concurrent.futures.html#threadpoolexecutor>
+
+하지만 이 방법은 결국 제한된 수의 I/O 병렬성만 제공된다는 문제점이 남아있다.  
+10,000개 이상의 셀을 동시에 처리하고 싶어도 저 방법으로는 한계가 있다.  
+
+이를 해결하기 위한 다음 방법이 coroutine을 사용하는 방식이다.
+
