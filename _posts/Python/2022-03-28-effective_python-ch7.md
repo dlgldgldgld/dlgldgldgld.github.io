@@ -291,3 +291,6 @@ print(columns)
 
 이를 해결하기 위한 다음 방법이 coroutine을 사용하는 방식이다.
 
+## 60. I/O를 할 때는 코루틴을 사용해 동시성을 높여라
+
+Corotine 설명 : <http://www.dabeaz.com/coroutines/Coroutines.pdf>
