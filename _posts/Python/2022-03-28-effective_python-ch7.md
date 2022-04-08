@@ -293,4 +293,17 @@ print(columns)
 
 ## 60. I/O를 할 때는 코루틴을 사용해 동시성을 높여라
 
-Corotine 설명 : <http://www.dabeaz.com/coroutines/Coroutines.pdf>
+앞선 상황들보다 상황에 따라 더 좋은 성능을 내기 위해 코루틴을 사용할 것을 권장한다.  
+코루틴이나 asyncio에 관한 설명은 아래의 링크에서 살펴보자.
+
+Corotine 설명 : <http://www.dabeaz.com/coroutines/Coroutines.pdf>  
+async : <https://docs.python.org/ko/3/library/asyncio-task.html#running-an-asyncio-program>
+
+코루틴은 스레드를 사용하는 대신 Event loop 알고리즘을 사용해 마치 async 하게 동작하는 것처럼 프로그램을 실행시킬 수 있다. 
+
+스레드도 결코 만만한 비용을 사용하는 방식이 아니고 GIL로 인해 만족스러운 결과를 얻을 수 없을수도 있기에 async 개념이 python에도 존재한다.
+
+코루틴 object를 만들려면 함수 앞에 `async`를 붙이면 된다.  
+그리고 비동기로 동작시킬 구문에는 `await`를 통해 결과를 대기하도록 만들면 해당 코드는 async하게 실행되는 알고리즘이 된다.
+
+example : <https://github.com/gilbutITbook/080235/blob/master/Chapter7/Better%20way60_3.py>
