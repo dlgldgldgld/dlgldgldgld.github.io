@@ -11,6 +11,13 @@ tag: Python
 - try에 들어가서 except를 하더라도 무조건 실행되는 block.
 - 주로 파일 핸들을 안전하게 닫기 위해 사용되는 문법이다.
 
+```python
+try:
+    file = open("test.txt","w")
+finally:
+    file.close()
+```
+
 ### else 블록
 - try에서 예외를 발생시키지 않으면 실행되는 블록
 - 아래 예제와 같이 코드를 분리하여 가독성을 높이고자 할때 사용되는 방식이다.
