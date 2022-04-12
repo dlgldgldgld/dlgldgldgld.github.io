@@ -37,3 +37,120 @@ def load_json_key(data, key):
         return result_dict[key]
 ```
 
+## 66. 재사용 가능한 try/finally 동작을 원한다면 contextlib과 with문을 활용하라
+
+python에서는 with문과 같이 특정 문맥(context) 안에서만 작업을 수행하는 기능을 제공한다.
+
+```python
+with open("filename.txt", "w") as handler:
+    handler.write("hello")
+```
+
+이 같은 기능은 class 내부에 `__enter__`, `__exit__` 함수를 구현해서 `with`문 안에 포함시키면 동작이 가능하다.  
+이 방식의 단점은 with 문에서 에러가 발생할 경우 `__exit__` 함수의 구현이 까다로울 수 있다는 것인데 이를 보완하기 위해 나온 것이 contextlib 이다.
+
+```python
+import logging
+from contextlib import contextmanager
+
+@contextmanager
+def debug_logging(level):
+    logger = logging.getLogger()
+    old_level = logger.getEffectiveLevel()
+    logger.setLevel(level)
+    try:
+        yield
+    finally:
+        logger.setLevel(old_level)
+
+def my_function():
+    logging.debug('디버깅')
+    logging.error('에러 로그')
+    logging.debug('디버깅')
+
+with debug_logging(logging.DEBUG):
+    print("* 내부:")
+    my_function()
+
+print('* 외부:')
+my_function()
+```
+
+위의 코드와 같이 간단하게 구현이 가능하다. 저렇게 source를 작성하면 with문에서 쉽게 동작하게 된다.  
+with -> yield -> my_function -> finally 순으로 소스가 동작한다.
+
+그래서 해당장에서 말하고자 하는 것은 **try/finally 구문을 여러곳에서 사용할 곳이 필요하다면 with문과 contextmanager를 사용해서 쉽게 구현을 할 것**을 권장하는 것이다.
+
+## 67. 지역 시간에는 time보다는 datetime을 사용하라
+
+프로그램에서 여러 나라의 Local time을 다뤄야 한다면 time 대신 datetime을 사용할 것을 권장한다.
+
+예를 들어 time을 사용해 태평양 시간대와 한국 시간대를 동시에 다루고 싶다고 하자.  
+
+```python
+import os
+if os.name == 'nt': # window
+    print("It can't execute in window OS.")
+else:
+    parse_format = "%Y-%m-%d %H:%M:%S %Z'
+    depart_icn = '2020-08-27 19:13:04 KST'
+    time_tuple = time.strptime(depart_icn, parse_format)
+    time_str = time.strftime(time_format, time_tuple)
+    print(time_str)
+
+    arrival_sfo = '2020-08-28 04:13:04 PDT'
+    time_tuple = time.strtime(arrival_sfo, parse_format) 
+    
+>>> 2020-08-27 19:13:04
+>>> Traceback ...
+>>> Value Error: unconverted data remains: PDT
+```
+
+time 모듈을 통해 여러 시간대를 다루면 위와 같이 ValueError가 발생한다.  
+이는 환경에 따라 시간대를 지원해주지 않을 수 있기 때문에 신뢰되는 작업이 아니다.
+
+그래서 이를 통일하기 위해 datetime, pytz를 통해 여러 지역시간을 다룰 것을 권장하고 있다. 
+
+datetime을 사용하면 아래 소스와 같이 간단하게 UTC를 KST로 바꾸는 것이 가능하다.
+
+```python
+from datetime import datetime, timezone
+
+now = datetime(2020, 8, 27, 10, 13, 4)
+now_utc = now.replace(tzinfo.timezone.utc)
+now_local = now_utc.astimezone()
+print(now_local)
+```
+
+timestamp로 바꾸는 것 또한 간편하다.
+
+```python
+time_str = '2020-08-27 19:13:04'
+now = datetime.strptime(time_str, time_format)
+
+time_tuple = now.timetuple()
+utc_now = time.mktime(time_tuple)
+
+print(utc_now)
+```
+
+pytz를 사용하면 간편하게 여러 시간대를 전환할 수 있다.
+
+```python
+import pytz
+
+arrival_sfo = '2020-08-28 04:13:04'
+sfo_dt_naive = datetime.strptime(arrival_sfo, time_format)   # 시간대가 설정되지 않은 시간
+eastern = pytz.timezone('US/Pacific')                        # 샌프란시스코의 시간대
+sfo_dt = eastern.localize(sfo_dt_naive)                      # 시간대를 샌프란시스코 시간대로 변경
+utc_dt = pytz.utc.normalize(sfo_dt.astimezone(pytz.utc))     # UTC로 변경
+print(utc_dt)
+
+korea = pytz.timezone('Asia/Seoul')
+korea_dt = korea.normalize(utc_dt.astimezone(korea))
+print(korea_dt)
+
+nepal = pytz.timezone('Asia/Katmandu')
+nepal_dt = nepal.normalize(utc_dt.astimezone(nepal))
+print(nepal_dt)
+```

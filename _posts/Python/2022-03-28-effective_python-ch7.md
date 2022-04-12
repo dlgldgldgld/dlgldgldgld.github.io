@@ -307,3 +307,7 @@ async : <https://docs.python.org/ko/3/library/asyncio-task.html#running-an-async
 그리고 비동기로 동작시킬 구문에는 `await`를 통해 결과를 대기하도록 만들면 해당 코드는 async하게 실행되는 알고리즘이 된다.
 
 example : <https://github.com/gilbutITbook/080235/blob/master/Chapter7/Better%20way60_3.py>
+
+## 61 ~ 63 pass
+- 해당 내용은 아직 때가 아닌 것 같아 우선은 패스.
+- asyncio에 대해서 좀 더 알아본 후에 살펴보자.
