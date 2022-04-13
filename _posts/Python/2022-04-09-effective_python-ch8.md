@@ -154,3 +154,97 @@ nepal = pytz.timezone('Asia/Katmandu')
 nepal_dt = nepal.normalize(utc_dt.astimezone(nepal))
 print(nepal_dt)
 ```
+
+## 68. copyreg을 사용해 pickle을 더 신뢰성 있게 만들라.
+
+pickle은 python 객체를 직렬화해서 bin 형태로 저장을하기 위해 제공되는 python module이다.  
+이 모듈의 단점중 하나는 버전이 서로 다른 상태에서 데이터를 load한 경우 신규 버전의 변수가 반영이 되지 않는다는 점이 있다.
+
+예를들면 A version 에서는 GameState라는 클래스의 변수가 level, lives 밖에 없었다면 B Version에서는 points가 추가되었다고 하자.  
+B Version에서 A Version의 bin 파일을 load하면 points 변수는 포함되지 않은 상태로 객체가 역직렬화된다.
+
+이러한 문제들로 인해 copyreg이라는 모듈을 사용해서 신뢰성을 보장하게 한다.
+
+
+```python
+import pickle
+
+
+class GameState:
+    def __init__(self):
+        self.level = 0
+        self.lives = 4
+        ## self.points = 0
+
+
+state = GameState()
+state_path = "game_state.bin"
+with open(state_path, "wb") as f:
+    pickle.dump(state, f)
+
+with open(state_path, "rb") as f:
+    state_after = pickle.load(f)
+    print(state_after.__dict__)
+
+
+class GameState:
+    def __init__(self):
+        self.level = 0
+        self.lives = 4
+        self.points = 0  # 추가됨.
+
+
+with open(state_path, "rb") as f:
+    state_after = pickle.load(f)
+    print("class에 변수를 추가하더라도 load시 반영되지 않음.")
+    print(state_after.__dict__)
+
+import copyreg
+
+
+class GameState:
+    def __init__(self, level=0, lives=4, points=0):
+        self.level = level
+        self.lives = lives
+        self.points = points  # 추가됨.
+
+
+def unpickle_game_state(kwargs):
+    return GameState(**kwargs)
+
+
+def pickle_game_state(game_state):
+    kwargs = game_state.__dict__
+    return unpickle_game_state, (kwargs,)
+
+
+copyreg.pickle(GameState, pickle_game_state)
+state = GameState()
+state.points += 1000
+serialized = pickle.dumps(state)
+state_after = pickle.loads(serialized)
+print(state_after.__dict__)
+
+
+class GameState:
+    def __init__(self, level=0, lives=4, points=0, magic=5):
+        self.level = level
+        self.lives = lives
+        self.points = points  # 추가됨.
+        self.magic = magic
+
+
+print("이전:", state.__dict__)
+state_after = pickle.loads(serialized)
+print("이후:", state_after.__dict__)
+
+```
+
+```text
+{'level': 0, 'lives': 4}
+class에 변수를 추가하더라도 load시 반영되지 않음.
+{'level': 0, 'lives': 4}
+{'level': 0, 'lives': 4, 'points': 1000}
+이전: {'level': 0, 'lives': 4, 'points': 1000}
+이후: {'level': 0, 'lives': 4, 'points': 1000, 'magic': 5}
+```
