@@ -248,3 +248,19 @@ class에 변수를 추가하더라도 load시 반영되지 않음.
 이전: {'level': 0, 'lives': 4, 'points': 1000}
 이후: {'level': 0, 'lives': 4, 'points': 1000, 'magic': 5}
 ```
+
+unpickle_game_state, pickle_game_state 을 변경하면 Class Version 지정도 가능하다.
+
+```
+def unpickle_game_state(kwargs):
+    version = kwargs.pop('version', 1)
+    if version == 1:
+        del kwargs['lives']
+    return GameState(**kwargs)
+
+
+def pickle_game_state(game_state):
+    kwargs = game_state.__dict__
+    kwargs['version'] = 2
+    return unpickle_game_state, (kwargs,)
+```
