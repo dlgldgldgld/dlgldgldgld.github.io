@@ -264,3 +264,21 @@ def pickle_game_state(game_state):
     kwargs['version'] = 2
     return unpickle_game_state, (kwargs,)
 ```
+class 이름이 변경된 경우에 unpickle 하면 변환을 하지 못하는 오류가 있다.
+이것 또한 copyreg을 통해 해결이 가능하다. 
+
+```python
+class BetterGameState:
+    def __init__(self, level=0, points=0, magic=5):
+        self.level = level
+        self.points = points
+        self.magic = magic
+
+pickle.loads(serialized)
+# GameState를 찾을수 없으므로 Error 발생.
+
+copyreg.pickle(BetterGameState, picle_game_state)
+state = BetterGameState()
+serialized = pickle.dumps(state)
+print(serialized)
+```
