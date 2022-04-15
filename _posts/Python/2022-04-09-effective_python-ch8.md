@@ -282,3 +282,56 @@ state = BetterGameState()
 serialized = pickle.dumps(state)
 print(serialized)
 ```
+
+## 69. 정확도가 매우 중요한 경우에는 decimal을 사용하라  
+
+IEEE 754 부동소수점 수의 내부(이진) 표현법으로 인해 일반 정수는 올바른 결과를 내보내지 않을 확률이 높다.  
+이런 경우 Decimal을 사용하면 좀 더 정교하게 계산이 가능하다.
+
+```python
+rate = 1.45
+seconds = 3*60 + 42
+cost = rate * seconds / 60
+print(cost)
+
+from decimal import Decimal
+rate = Decimal('1.45')
+seconds = Decimal(3 * 60 + 42)
+cost = rate * seconds / Decimal(60)
+print(cost)
+
+
+# 소수점을 넘길시에는 문자열을 사용하면 오차가 발생하지 않음.
+print(Decimal('1.45'))
+print(Decimal(1.45))
+
+# 정수는 제외
+print(Decimal('456'))
+print(Decimal(456))
+
+# 또다른 예제
+rate = Decimal('0.05')
+seconds = Decimal('5')
+small_cost = rate * seconds / Decimal(60)
+print(small_cost)
+
+from decimal import ROUND_UP
+
+rounded = cost.quantize(Decimal('0.01'), rounding=ROUND_UP)
+print(f'반올림 전: {cost} 반올림 후: {rounded}')
+
+rounded = small_cost.quantize(Decimal('0.01'), rounding=ROUND_UP)
+print(f'반올림 전: {small_cost} 반올림 후: {rounded}')
+```
+
+```text
+5.364999999999999
+5.365
+1.45
+1.4499999999999999555910790149937383830547332763671875
+456
+456
+0.004166666666666666666666666667
+반올림 전: 5.365 반올림 후: 5.37
+반올림 전: 0.004166666666666666666666666667 반올림 후: 0.01
+```
