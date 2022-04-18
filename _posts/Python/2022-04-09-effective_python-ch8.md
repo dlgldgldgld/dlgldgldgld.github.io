@@ -335,3 +335,105 @@ print(f'반올림 전: {small_cost} 반올림 후: {rounded}')
 반올림 전: 5.365 반올림 후: 5.37
 반올림 전: 0.004166666666666666666666666667 반올림 후: 0.01
 ```
+
+## 70. 최적화하기 전에 프로파일링을 하라
+
+프로파일링이란 코드의 성능을 측정하는 것이다.  
+예를 들자면 특정 함수가 전체 프로그램 수행시간 중 몇 % 를 차지하고 있는지 통계를 내보는 등의 행위를 의미한다.
+
+Python에서는 이에 관한 모듈이 제공된다. cProfile 모듈이 이에 해당된다.  
+아래는 해당 모듈을 사용해서 프로파일링한 소스의 예제이다.  
+
+Profile class를 생성한 후, runcall 함수를 호출해서 인자로 프로파일링을 해볼 함수명을 입력하면 된다.  
+이 후, pstats 모듈의 Stats 클래스를 사용해서 결과를 출력하는 것이 가능하다.
+
+만약 특정 함수가 여러 function에서 실행 될 경우, Caller 별로 통계치를 보고 싶을 수 있다.  
+이는 **print_callers()** 함수를 통해 확인이 가능하다.
+
+```python
+def my_utility(a, b):
+    c = 1
+    for i in range(100):
+        c += a * b
+
+def first_func():
+    for _ in range(1000):
+        my_utility(4, 5)
+
+def second_func():
+    for _ in range(10):
+        my_utility(1, 3)
+
+def my_program():
+    for _ in range(20):
+        first_func()
+        second_func()
+
+from cProfile import Profile
+from pstats import Stats
+
+profiler = Profile()
+profiler.runcall(my_program)
+
+stats = Stats(profiler)
+stats.strip_dirs()
+stats.sort_stats('cumulative')
+stats.print_stats()
+
+stats.print_callers()
+```
+
+```text
+         20242 function calls in 0.109 seconds
+
+   Ordered by: cumulative time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.109    0.109 hello.py:14(my_program)
+       20    0.003    0.000    0.108    0.005 hello.py:6(first_func)
+    20200    0.105    0.000    0.105    0.000 hello.py:1(my_utility)
+       20    0.000    0.000    0.001    0.000 hello.py:10(second_func)
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+
+
+   Ordered by: cumulative time
+
+Function                                          was called by...
+                                                      ncalls  tottime  cumtime
+hello.py:14(my_program)                           <-
+hello.py:6(first_func)                            <-      20    0.003    0.108  hello.py:14(my_program)
+hello.py:1(my_utility)                            <-   20000    0.104    0.104  hello.py:6(first_func)
+                                                         200    0.001    0.001  hello.py:10(second_func)
+hello.py:10(second_func)                          <-      20    0.000    0.001  hello.py:14(my_program)
+{method 'disable' of '_lsprof.Profiler' objects}  <-
+
+```
+
+## 71. producer-consumer 전용 queue로는 deque를 사용하라
+
+프로그램 개발시 흔히 사용되는 패턴인 producer-consumer pattern을 구현할때 task를 관리하기 위해 queue를 사용한다.  
+일부 개발자들은 queue를 list를 통해 구현하는데 이때 몇가지 문제가 발생한다.
+
+1. 크기(cardinality)가 늘어날수록 리스트 타입의 성능은 선형보다 더 나빠진다.
+2. list를 통해 pop(0)을 할때 리스트의 모든 원소를 재배열하기 때문에 느리다.
+
+그로 인해 해당 챕터에서는 list를 사용하는 대신 deque를 사용할 것을 권장한다.  
+append 시의 속도는 크게 차이가 없지만 pop을 할때는 무시할 수 없는 수치로 차이가 나게된다.  
+
+책에서 측정된 성능을 정리하면 다음과 같다. 
+
+|case|list|deque|diff|
+|----|----|----|----|
+|append(500)|0.000023s|0.000022s|0.000001s|
+|append(1,000)|0.000045s|0.000044s|0.000001s|
+|append(2,000)|0.000087s|0.000091s|-0.000004s|
+|append(3,000)|0.000134s|0.000142s|-0.000008s|
+|append(4,000)|0.000181s|0.000192s|-0.000011s|
+|append(5,000)|0.000231s|0.000244s|-0.000013s|
+|pop(500)|0.000043s|0.000019s|0.000024s|
+|pop(1,000)|0.000097s|0.000041s|0.000056s|
+|pop(2,000)|0.000252s|0.000081s|0.000001s|
+|pop(3,000)|0.000464s|0.000126s|0.000171s|
+|pop(4,000)|0.000751s|0.000169s|0.000582s|
+|pop(5,000)|0.001229s|0.000213s|0.001016s|
+
