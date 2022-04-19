@@ -422,18 +422,72 @@ append 시의 속도는 크게 차이가 없지만 pop을 할때는 무시할 �
 
 책에서 측정된 성능을 정리하면 다음과 같다. 
 
-|case|list|deque|diff|
-|----|----|----|----|
-|append(500)|0.000023s|0.000022s|0.000001s|
-|append(1,000)|0.000045s|0.000044s|0.000001s|
-|append(2,000)|0.000087s|0.000091s|-0.000004s|
-|append(3,000)|0.000134s|0.000142s|-0.000008s|
-|append(4,000)|0.000181s|0.000192s|-0.000011s|
-|append(5,000)|0.000231s|0.000244s|-0.000013s|
-|pop(500)|0.000043s|0.000019s|0.000024s|
-|pop(1,000)|0.000097s|0.000041s|0.000056s|
-|pop(2,000)|0.000252s|0.000081s|0.000001s|
-|pop(3,000)|0.000464s|0.000126s|0.000171s|
-|pop(4,000)|0.000751s|0.000169s|0.000582s|
-|pop(5,000)|0.001229s|0.000213s|0.001016s|
+| case          | list      | deque     | diff       |
+| ------------- | --------- | --------- | ---------- |
+| append(500)   | 0.000023s | 0.000022s | 0.000001s  |
+| append(1,000) | 0.000045s | 0.000044s | 0.000001s  |
+| append(2,000) | 0.000087s | 0.000091s | -0.000004s |
+| append(3,000) | 0.000134s | 0.000142s | -0.000008s |
+| append(4,000) | 0.000181s | 0.000192s | -0.000011s |
+| append(5,000) | 0.000231s | 0.000244s | -0.000013s |
+| pop(500)      | 0.000043s | 0.000019s | 0.000024s  |
+| pop(1,000)    | 0.000097s | 0.000041s | 0.000056s  |
+| pop(2,000)    | 0.000252s | 0.000081s | 0.000001s  |
+| pop(3,000)    | 0.000464s | 0.000126s | 0.000171s  |
+| pop(4,000)    | 0.000751s | 0.000169s | 0.000582s  |
+| pop(5,000)    | 0.001229s | 0.000213s | 0.001016s  |
 
+## 72. 정렬된 시퀀스를 검색할 때는 bisect를 사용하라
+
+정렬된 시퀀스 컨테이너를 검색할때 보통 qsort를 사용해 binary search를 한다.  
+python에서는 binary search를 위한 module이 이미 구현되어 있어 이를 사용해 시퀀스 검색을 빠르게 할 수 있다.
+
+bisect_left, bisect_right 두 가지 존재한다.  
+
+- bisect_left : sequence 안에 데이터가 존재시 값이 위치한 index return.
+- bisect_right : sequence 안에 데이터가 존재시 index의 오른쪽을 return.   
+
+```python
+import random
+import timeit
+from bisect import bisect_left
+
+size = 10**5
+iterations = 1000
+
+data = list(range(size))
+to_lookup = [random.randint(0, size) for _ in range(iterations)]
+
+
+def run_linear(data, to_lookup):
+    for index in to_lookup:
+        data.index(index)
+
+
+def run_bisect(data, to_lookup):
+    for index in to_lookup:
+        bisect_left(data, index)
+
+
+baseline = timeit.timeit(
+    stmt="run_linear(data, to_lookup)", globals=globals(), number=10
+)
+
+print(f"선형 검색: {baseline:.6f}초")
+
+comparison = timeit.timeit(
+    stmt="run_bisect(data, to_lookup)", globals=globals(), number=10
+)
+
+print(f"이진 검색: {comparison:.6f}초")
+
+slowdown = 1 + ((baseline - comparison) / comparison)
+print(f"선형 검색이 {slowdown:.1f}배 더 걸림")
+
+```
+
+```text
+선형 검색: 4.093573초
+이진 검색: 0.006002초      
+선형 검색이 682.1배 더 걸림
+```
