@@ -491,3 +491,53 @@ print(f"선형 검색이 {slowdown:.1f}배 더 걸림")
 이진 검색: 0.006002초      
 선형 검색이 682.1배 더 걸림
 ```
+
+## 73. 우선순위 큐로 heapq를 사용하는 방법을 알아두라
+
+priority queue는 특정 기준에 따라 queue의 순서를 항상 유지하고 싶을때 사용되는 
+container 종류 중의 하나이다.  
+
+책에서는 이를 위해 `heapq` 라는 모듈을 사용할 것을 권장한다.  
+heapq 모듈은 list container 변수를 기반으로 실제 heap 처럼 push를 하거나 pop을 할 수 있게끔
+확장성이 높은 기능등을 제공한다.
+
+만약 자신이 직접 정의한 class를 element로 넣고 싶다면 `functools.total_ordering`을 데코레이터로 받은 다음  
+magic method `__lt__`를 정의해주면 된다.
+
+```python
+from heapq import heappush, heappop, heapify
+
+import functools
+
+
+@functools.total_ordering
+class Book:
+    def __init__(self, title, due_date):
+        self.title = title
+        self.due_date = due_date
+
+    def __lt__(self, other):
+        return self.due_date < other.due_date
+
+
+queue = []
+
+heappush(queue, Book("harry porter", "2022-04-20"))
+heappush(queue, Book("작은 아씨들", "2022-05-21"))
+
+heappop(queue)  # 가장 앞의 책을 pop
+heappop(queue)
+
+queue = [
+    Book("오만과 편견", "2020-06-01"),
+    Book("타임 머신", "2020-06-02"),
+    Book("죄와 벌", "2020-06-04"),
+    Book("폭풍의 언덕", "2020-06-03"),
+]
+
+heapify(queue)
+
+```
+
+## 74. bytes를 복사하지 않고 다루려면 memoryview와 bytearray를 사용하라
+
