@@ -541,3 +541,46 @@ heapify(queue)
 
 ## 74. bytes를 복사하지 않고 다루려면 memoryview와 bytearray를 사용하라
 
+python에서의 자료형은 대부분 자동으로 연역된다.  
+이런 특성 때문인지 bytes 데이터를 다룰때는 기본적으로 복사가 발생하게 된다.  
+
+만약 bytes 데이터를 slice 할 경우 대부분 copy가 발생하게 되는데 이런 copy를 방지하기 위해  
+memoryview라는 모듈이 제공되고 있다.
+
+이는 C-API의 Buffer protocol을 통해 구현이 되어 있으며 이를 사용해 zero copy 연산이 가능하도록 지원한다.
+일반적인 사용 예시는 다음과 같다.  
+
+책에서의 예시는 copy로 데이터를 읽어오는 방식보다 엄청나게 빠른 속도로 개선이 가능하다.  
+( byte slice : 5밀리초, memoryview : 250 나노초 )
+
+```python
+data = "동해물과 abc 백두산이 마르고 닳도록".encode("utf8")
+view = memoryview(data)
+chunk = view[12:19]
+print(chunk)
+print(chunk.nbytes)
+print(chunk.tobytes())
+print(chunk.obj)
+```
+
+bytes를 memoryview에 보내면 값을 수정하지 못한다.  
+실제로 bytes 자료형의 데이터를 index를 통해 값을 바꾸면 에러가 발생하게 된다.
+
+그럴때는 bytearray를 사용하면 값을 바꾸는 것이 가능하다.  
+이처럼 bytes 자료형을 사용할 경우 memoryview나 bytearray를 사용하는 것을 검토해보면 성능 향상을 도모할 수 있게 된다.
+
+```python
+
+# Python program to illustrate
+# Modifying internal data using memory view
+ 
+# random bytearray
+byte_array = bytearray('XYZ', 'utf-8')
+print('Before update:', byte_array)
+ 
+mem_view = memoryview(byte_array)
+ 
+# update 2nd index of mem_view to J
+mem_view[2] = 74
+print('After update:', byte_array)
+```
