@@ -107,9 +107,78 @@ sqlite에서 index가 없는 경우에는 무려 1.7초나 걸린다.
 ----
 <br>
 
-# 2. ElasticSerach VS SQLITE-FTS 성능 비교
+# 2. ElasticSerach VS SQLITE3-FTS5 성능 비교
 
-## evaluation
-1. 검색 속도
-2. 
+다음은 ElasticSearch와 SQLITE3-FTS5의 성능을 비교해보자.  
+FTS5(Full-Text-Search)는 SQLITE3에서 제공되는 검색 용도로 사용하는 Virtual Table이다.  
 
+단순히 title, content로 이루어진 posts table(혹은 class)를 탐색하는 속도를 비교해보고자 한다.
+
+## 게시글(posts) Schema
+
+|Column|Column(eng)|type|
+|---|---|----|
+|글제목|title|text|
+|글내용|content|text|
+
+## input 데이터 제작
+
+elasticsearch에 bulk 하기 위해 json 형식의 input 데이터가 필요하다.  
+이 후, linux 서버에서 아래 쿼리를 날려 bulk 하는 방식으로 데이터를 삽입하고자 한다.
+
+query : `curl -XPOST http://localhost:9200/_bulk?pretty -–data-binary @[json_file_name] -H 'Content-Type: application/json'`
+
+bulk 데이터 삽입시에는 아래 이미지와 같이 index 정보가 미리 들어가 있어야 하므로 주의가 필요하다. 
+( _index = database, _type = table 로 생각하면 된다. )
+
+![alt](../../../assets/images/2022-03-18-nosql_performance_test/TEST2_FTS5_ELASTICSEARCH_BULK.png)  
+
+sqlite3용 데이터는 csv를 bulk하면 되므로 별도로 설명하지는 않겠다.  
+fts5 사용방법은 <https://www.sqlitetutorial.net/sqlite-full-text-search/>를 참조했다.  
+
+- [testcase2 input 생성 소스](https://github.com/dlgldgldgld/NoSQL-PerformanceTest/blob/main/testcase/testcase2_gen.py)
+
+## Test 방식
+
+elasticserach, sqlite3 모두 python을 통해 test를 진행했다. 
+content 기준 keyword 검색시 matching 되는 항목들의 title을 가져오는 방식으로 테스트를 시도해보았다.
+
+```python
+# elasticsearch 
+resp = es.search(index="posts", size=10000, query={"match" : { "content" : keyword}})
+    for hit in resp['hits']['hits']:
+        result.append(hit['_source']['title'])
+
+# sqlite3
+for row in cursor.execute(
+        "SELECT title from posts where content MATCH '" + keyword + "'"):
+        result.append(row[0])
+```
+
+## test 결과 
+
+![alt](../../../assets/images/2022-03-18-nosql_performance_test/TEST2_FTS5_ELASTICSEARCH.png)  
+
+10만개의 record를 대상으로 테스트 진행시 sqlite가 약 10배 정도로 빨랐다.  
+하지만 Http transport를 하는것과 local에서 가져오는 것의 차이가 있기에 당연히 Elasticsearch가 sqlite 보다는 느릴 수 밖에 없을 것이라 생각한다.
+
+그래도 <u>ElasticSearch도 10만개의 record를 대상으로 약 163ms 만에 게시글을 검색</u>이 가능하다는 점은 매우 흥미로웠다. 
+REST API로 쉽게 사용도 가능하고 저정도면 속도도 나쁘지 않은 것 같아보인다.  
+
+**match_size**는 실제로 검색을 통해 찾은 항목들의 개수인데 두 개 모두 일치하는 것을 알 수 있었다.
+
+----
+<br>
+
+# 글을 마치며
+
+책에서 본 내용을 바탕으로 NoSQL를 접해보고, 성능 비교를 위해 이들을 간단하게나마 사용해 볼 수 있었다.  
+사실 테스트를 제대로 한건지도 의문이긴 하지만 더 깊게 파고들면 공부할 것이 많아질 것 같아 이정도까지만 해보고 마치려 한다.
+
+확실히 RDBMS 만으로는 만족하지 못하는 요구사항들이 존재하는 것이 있었고, 이것들을 충족시키기 위해 다른 컨셉의 DB가 필요하다는 것을 확실히 알 수 있었다.  
+
+물론 이번에 해본 것은 모두 빙산의 일각이겠지만 그래도 재미난 경험이었다.  
+개인적으로 좀 더 확실한 테스트 환경 구성을 위해 EC2를 사용했어야 하지 않았나 싶지만 이것은 다음 기회에 도전해봐야겠다.
+
+이 글이 비슷한 주제로 궁금증을 가지는 사람들에게 조금이나마 도움이 되었으면 한다.  
+**(oﾟvﾟ)ノ (oﾟvﾟ)ノ**
