@@ -422,18 +422,165 @@ append 시의 속도는 크게 차이가 없지만 pop을 할때는 무시할 �
 
 책에서 측정된 성능을 정리하면 다음과 같다. 
 
-|case|list|deque|diff|
-|----|----|----|----|
-|append(500)|0.000023s|0.000022s|0.000001s|
-|append(1,000)|0.000045s|0.000044s|0.000001s|
-|append(2,000)|0.000087s|0.000091s|-0.000004s|
-|append(3,000)|0.000134s|0.000142s|-0.000008s|
-|append(4,000)|0.000181s|0.000192s|-0.000011s|
-|append(5,000)|0.000231s|0.000244s|-0.000013s|
-|pop(500)|0.000043s|0.000019s|0.000024s|
-|pop(1,000)|0.000097s|0.000041s|0.000056s|
-|pop(2,000)|0.000252s|0.000081s|0.000001s|
-|pop(3,000)|0.000464s|0.000126s|0.000171s|
-|pop(4,000)|0.000751s|0.000169s|0.000582s|
-|pop(5,000)|0.001229s|0.000213s|0.001016s|
+| case          | list      | deque     | diff       |
+| ------------- | --------- | --------- | ---------- |
+| append(500)   | 0.000023s | 0.000022s | 0.000001s  |
+| append(1,000) | 0.000045s | 0.000044s | 0.000001s  |
+| append(2,000) | 0.000087s | 0.000091s | -0.000004s |
+| append(3,000) | 0.000134s | 0.000142s | -0.000008s |
+| append(4,000) | 0.000181s | 0.000192s | -0.000011s |
+| append(5,000) | 0.000231s | 0.000244s | -0.000013s |
+| pop(500)      | 0.000043s | 0.000019s | 0.000024s  |
+| pop(1,000)    | 0.000097s | 0.000041s | 0.000056s  |
+| pop(2,000)    | 0.000252s | 0.000081s | 0.000001s  |
+| pop(3,000)    | 0.000464s | 0.000126s | 0.000171s  |
+| pop(4,000)    | 0.000751s | 0.000169s | 0.000582s  |
+| pop(5,000)    | 0.001229s | 0.000213s | 0.001016s  |
 
+## 72. 정렬된 시퀀스를 검색할 때는 bisect를 사용하라
+
+정렬된 시퀀스 컨테이너를 검색할때 보통 qsort를 사용해 binary search를 한다.  
+python에서는 binary search를 위한 module이 이미 구현되어 있어 이를 사용해 시퀀스 검색을 빠르게 할 수 있다.
+
+bisect_left, bisect_right 두 가지 존재한다.  
+
+- bisect_left : sequence 안에 데이터가 존재시 값이 위치한 index return.
+- bisect_right : sequence 안에 데이터가 존재시 index의 오른쪽을 return.   
+
+```python
+import random
+import timeit
+from bisect import bisect_left
+
+size = 10**5
+iterations = 1000
+
+data = list(range(size))
+to_lookup = [random.randint(0, size) for _ in range(iterations)]
+
+
+def run_linear(data, to_lookup):
+    for index in to_lookup:
+        data.index(index)
+
+
+def run_bisect(data, to_lookup):
+    for index in to_lookup:
+        bisect_left(data, index)
+
+
+baseline = timeit.timeit(
+    stmt="run_linear(data, to_lookup)", globals=globals(), number=10
+)
+
+print(f"선형 검색: {baseline:.6f}초")
+
+comparison = timeit.timeit(
+    stmt="run_bisect(data, to_lookup)", globals=globals(), number=10
+)
+
+print(f"이진 검색: {comparison:.6f}초")
+
+slowdown = 1 + ((baseline - comparison) / comparison)
+print(f"선형 검색이 {slowdown:.1f}배 더 걸림")
+
+```
+
+```text
+선형 검색: 4.093573초
+이진 검색: 0.006002초      
+선형 검색이 682.1배 더 걸림
+```
+
+## 73. 우선순위 큐로 heapq를 사용하는 방법을 알아두라
+
+priority queue는 특정 기준에 따라 queue의 순서를 항상 유지하고 싶을때 사용되는 
+container 종류 중의 하나이다.  
+
+책에서는 이를 위해 `heapq` 라는 모듈을 사용할 것을 권장한다.  
+heapq 모듈은 list container 변수를 기반으로 실제 heap 처럼 push를 하거나 pop을 할 수 있게끔
+확장성이 높은 기능등을 제공한다.
+
+만약 자신이 직접 정의한 class를 element로 넣고 싶다면 `functools.total_ordering`을 데코레이터로 받은 다음  
+magic method `__lt__`를 정의해주면 된다.
+
+```python
+from heapq import heappush, heappop, heapify
+
+import functools
+
+
+@functools.total_ordering
+class Book:
+    def __init__(self, title, due_date):
+        self.title = title
+        self.due_date = due_date
+
+    def __lt__(self, other):
+        return self.due_date < other.due_date
+
+
+queue = []
+
+heappush(queue, Book("harry porter", "2022-04-20"))
+heappush(queue, Book("작은 아씨들", "2022-05-21"))
+
+heappop(queue)  # 가장 앞의 책을 pop
+heappop(queue)
+
+queue = [
+    Book("오만과 편견", "2020-06-01"),
+    Book("타임 머신", "2020-06-02"),
+    Book("죄와 벌", "2020-06-04"),
+    Book("폭풍의 언덕", "2020-06-03"),
+]
+
+heapify(queue)
+
+```
+
+## 74. bytes를 복사하지 않고 다루려면 memoryview와 bytearray를 사용하라
+
+python에서의 자료형은 대부분 자동으로 연역된다.  
+이런 특성 때문인지 bytes 데이터를 다룰때는 기본적으로 복사가 발생하게 된다.  
+
+만약 bytes 데이터를 slice 할 경우 대부분 copy가 발생하게 되는데 이런 copy를 방지하기 위해  
+memoryview라는 모듈이 제공되고 있다.
+
+이는 C-API의 Buffer protocol을 통해 구현이 되어 있으며 이를 사용해 zero copy 연산이 가능하도록 지원한다.
+일반적인 사용 예시는 다음과 같다.  
+
+책에서의 예시는 copy로 데이터를 읽어오는 방식보다 엄청나게 빠른 속도로 개선이 가능하다.  
+( byte slice : 5밀리초, memoryview : 250 나노초 )
+
+```python
+data = "동해물과 abc 백두산이 마르고 닳도록".encode("utf8")
+view = memoryview(data)
+chunk = view[12:19]
+print(chunk)
+print(chunk.nbytes)
+print(chunk.tobytes())
+print(chunk.obj)
+```
+
+bytes를 memoryview에 보내면 값을 수정하지 못한다.  
+실제로 bytes 자료형의 데이터를 index를 통해 값을 바꾸면 에러가 발생하게 된다.
+
+그럴때는 bytearray를 사용하면 값을 바꾸는 것이 가능하다.  
+이처럼 bytes 자료형을 사용할 경우 memoryview나 bytearray를 사용하는 것을 검토해보면 성능 향상을 도모할 수 있게 된다.
+
+```python
+
+# Python program to illustrate
+# Modifying internal data using memory view
+ 
+# random bytearray
+byte_array = bytearray('XYZ', 'utf-8')
+print('Before update:', byte_array)
+ 
+mem_view = memoryview(byte_array)
+ 
+# update 2nd index of mem_view to J
+mem_view[2] = 74
+print('After update:', byte_array)
+```
