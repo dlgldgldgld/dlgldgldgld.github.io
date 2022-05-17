@@ -25,6 +25,8 @@ SELECT
 [ OFFSET start ]
 ```
 
+<br>
+
 # SQL Reference Conventions
 
 규칙은 플랫폼별로 거의 동일한 방식으로 구성되어 있는 듯하다.  
@@ -41,6 +43,9 @@ SELECT
 |*italics*|기울여진 단어는 placeholders(아무것도 없을때 그냥 들어가있는 값)를 뜻한다. 규칙에 italics체의 단어가 있다면 이 값 대신 무조건 필요한 내용을 채워 넣어야 한다.|
 |...|줄임표는 이전에 나온 element를 반복할 수 있음을 뜻한다.|
 |'|작은 따옴표로 묶인 단어는 따옴표를 입력해야 한다는 것을 의미한다.|
+
+<br>
+
 
 # Expressions
 
@@ -80,6 +85,8 @@ venueid |        venuename        | venuecity | venuestate | venueseats
 91 | Raymond James Stadium   | Tampa     | FL         |      65647
 (3 rows)
 ```
+
+<br>
 
 # Example
 
