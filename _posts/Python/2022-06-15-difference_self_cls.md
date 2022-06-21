@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "[PYTHON] - self와 cls의 차이는? ( __init__ vs __new__ )"
+title:  "[PYTHON] - self와 cls의 차이는? ( __init__ vs __new__ .. and __call__ )"
 category: Python
 tag: Python
 ---
@@ -52,6 +52,71 @@ self는 일반적으로 함수를 했던것과 같이 정의를 하면된다.
 >> Whenever a class is instantiated __new__ and __init__ methods are called. __new__ method will be called when an object is created and __init__ method will be called to initialize the object. In the base class object, the __new__ method is defined as a static method which requires to pass a parameter cls. cls represents the class that is needed to be instantiated, and the compiler automatically provides this parameter at the time of instantiation.
 
 
+## __call__ method는 무엇일까?
+`__init__`과 `__new__`와 같이 언급되는 `__call__`이라는 매직메소드도 존재한다.  
+이것은 객체가 생성된 이후 `()` operator가 호출될때 불러오는 함수이다.  
+아래 코드와 같이 `()` 호출시 `__call__` 함수가 호출 됨을 할 수 있다.  
+
+```python
+class A(object):
+    def __call__(self):
+        print('__call__')
+    def __init__(self):
+        print('__init__')
+    def __new__(cls):
+        print('__new__')
+        return super(A, cls).__new__(cls)
+        
+a = A()
+>>__new__
+>>__init__
+
+a()
+>>__call__
+```
+
+관련해서 정확한 사용처는 잘 모르겠으나 metaclass를 사용한 Singleton 함수를 정의할때 아래와 같이 사용된다.
+
+아래 코드에서 MyInt.__call__이 호출될 수 있는 이유는 int가 결국 MyInt()를 통해 생성된 클래스(객체)이고, int(4,5)가 호출될때 `()` operator를 호출하였기에 위와 같이 동작이 가능한 경우다.
+
+```python
+class MyInt(type):
+    def __call__(cls, *args, **kwds):
+        print('***** Here My int *****', args)
+        print('Now do whatever you want with these objects...')
+        return type.__call_(cls, *args, **kwds)
+
+class int(metaclass=MyInt):
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+i = int(4,5)
+>> ***** Here My int ***** (4, 5)
+>> Now do whatever you want with these objects...
+
+```
+
+이와 같은 metaclass의 특징을 이용하여 Singleton 패턴을 구현하는 것이 가능하다.
+
+```python
+class MetaSingleton(type):
+    _instnaces = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(MetaSingleton, cls).__call__(*args, **kwargs)
+        return cls._instance[cls]
+
+class Logger(metaclass=MetaSingleton):
+    pass
+
+logger1 = Logger()
+logger2 = Logger()
+print(logger1, logger2)
+```
+
+
 ## 참조글
 - [geeksforgeeks](https://www.geeksforgeeks.org/__new__-in-python/) - __new__ in Python
 - [pythontutorial.net](https://www.pythontutorial.net/python-oop/python-__new__/) - Python_new
+- <<파이썬 디자인 패턴 2/e>> - 체탄 기리다 지음, 이우현 옮김
