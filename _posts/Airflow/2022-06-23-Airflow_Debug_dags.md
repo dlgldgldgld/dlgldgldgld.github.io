@@ -26,5 +26,5 @@ tag: Airflow
 
 
 # 참조
-- Visual Studio Code Docs : [https://code.visualstudio.com/docs/editor/debugging]
-- Airflow - Debug Executor : [https://airflow.apache.org/docs/apache-airflow/stable/executor/debug.html#debug-executor]
+- Visual Studio Code Docs : <https://code.visualstudio.com/docs/editor/debugging>
+- Airflow - Debug Executor : <https://airflow.apache.org/docs/apache-airflow/stable/executor/debug.html#debug-executor>
