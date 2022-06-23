@@ -19,11 +19,12 @@ tag: Airflow
       KST = timezone(timedelta(hours=9))
       start_date=datetime(year=2022, month=5, day=1, hour=21, minute=0, second=0, tzinfo=KST)
       end_date=datetime(year=2022, month=6, day=1, hour=21, minute=0, second=0, tzinfo=KST)
-      dag.clear()
+      dag.clear(task_ids=['transform_load'])
       dag.run(start_date = start_date, end_date = end_date, ignore_task_deps=True)
     ```
    - dag.clear() 이후 dag.run()으로 실행 가능.
      - run에는 다양한 인자를 설정할 수 있으니 참조.
+     - task filtering을 하려면 clear 함수에서 task_ids에 테스트할 task만 기입해주면 된다.
      - **ignore_task_deps를 True**로 하면 dag안에 있는 모든 task에 대해서 test가 가능한 것 같다.
 3. 이후 IDE tool에서 디버깅을 하면 정상적으로 디버깅할 수 있다.
    ![alt](../../assets/images/2022-06-23-Airflow_Debug_dags/image2.png)
