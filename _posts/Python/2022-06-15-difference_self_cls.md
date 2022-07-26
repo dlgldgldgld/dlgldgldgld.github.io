@@ -120,3 +120,4 @@ print(logger1, logger2)
 - [geeksforgeeks](https://www.geeksforgeeks.org/__new__-in-python/) - __new__ in Python
 - [pythontutorial.net](https://www.pythontutorial.net/python-oop/python-__new__/) - Python_new
 - <<파이썬 디자인 패턴 2/e>> - 체탄 기리다 지음, 이우현 옮김
+- [Scaler Topics](https://www.scaler.com/topics/init-function-in-python/) - __init__ in Python
